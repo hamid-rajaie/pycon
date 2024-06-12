@@ -22,9 +22,7 @@ class PyConConfig:
         # ======================================================================
         #
         # ======================================================================
-        self.pycon_start_dir = (
-            "C:\\develop\\pycon\\generators\\csv_generators\\csv_gen_0000\output"
-        )
+        self.pycon_start_dir = "C:\\develop\\pycon\\generators\\csv_generators\\csv_gen_0000\output"
 
         self.pycon_start_dir_filter = ["CSV Files (*.csv)", "CanAPE (*.mf4)"]
         self.pycon_start_dir_filter_selected = self.pycon_start_dir_filter[0]
@@ -46,6 +44,10 @@ class PyConConfig:
             {
                 "plugin_package": "plugins.templates",
                 "plugin_dir": "C:\\develop\\pycon\\plugins\\templates",
+            },
+            {
+                "plugin_package": "plugins.videos",
+                "plugin_dir": "C:\\develop\\pycon\\plugins\\videos",
             },
         ]
 
