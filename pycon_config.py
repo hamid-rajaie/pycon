@@ -64,6 +64,10 @@ class PyConConfig:
                 "plugin_package": "plugins.web",
                 "plugin_dir": "C:\\develop\\pycon\\plugins\\web",
             },
+            {
+                "plugin_package": "plugins.top_view",
+                "plugin_dir": "C:\\develop\\pycon\\plugins\\top_view",
+            },
         ]
 
 

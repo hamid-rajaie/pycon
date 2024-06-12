@@ -100,13 +100,13 @@ class PyConWindowSignalTable(PyConPluginBase):
         self.selected_signals = {}
         self.selected_signals_columns = {}
 
-        self.initUI()
+        self.__initUI()
         # When you create your own sub window, you must set the WA_DeleteOnClose widget attribute
         # if you want the window to be deleted when closed in the MDI area.
         # If not, the window will be hidden and the MDI area will not activate the next sub window.
         # self.setAttribute(Qt.WA_DeleteOnClose, wa_delete_on_close)
 
-    def initUI(self):
+    def __initUI(self):
         # https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QTableView.html
         # https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QAbstractItemView.html
         # https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QHeaderView.html

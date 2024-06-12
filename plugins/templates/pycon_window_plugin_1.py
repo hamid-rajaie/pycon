@@ -17,7 +17,7 @@ class PyConWindowPlugin_1(PyConPluginBase):
         self.video_time_msec = 0
         self.cap = None
 
-        self.initUI()
+        self.__initUI()
 
-    def initUI(self):
+    def __initUI(self):
         pass

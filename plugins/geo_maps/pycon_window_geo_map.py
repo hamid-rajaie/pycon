@@ -57,10 +57,10 @@ class PyConWindowGeoMap(PyConPluginBase):
         self.geo_map = None
         self.internal_status = False
 
-        self.initUI()
-        self.load_signals()
+        self.__initUI()
+        self.__load_signals()
 
-    def initUI(self):
+    def __initUI(self):
         self.geo_map_view = QWebEngineView()
         self.geo_map_view.page().setWebChannel(self.channel)
 
@@ -81,7 +81,7 @@ class PyConWindowGeoMap(PyConPluginBase):
         """
         self.geo_map_view.load(url)
 
-    def load_signals(self):
+    def __load_signals(self):
         try:
             self.time = self.pycon_app_data_source.get_channel(channel_name="timestamp")
             self.lon_wgs84 = self.pycon_app_data_source.get_channel(channel_name="lon_wgs84")
@@ -122,8 +122,6 @@ class PyConWindowGeoMap(PyConPluginBase):
 
         lon_wgs84 = self.lon_wgs84.samples[idx]
         lat_wgs84 = self.lat_wgs84.samples[idx]
-
-        logger().info(f"time_msec:{time_msec}  idx:{idx}  location : {lon_wgs84} , {lat_wgs84}")
 
         self.__add_marker(latitude=lat_wgs84, longitude=lon_wgs84)
 

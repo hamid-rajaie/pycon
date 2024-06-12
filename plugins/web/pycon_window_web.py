@@ -29,9 +29,9 @@ class PyConWindowWeb(PyConPluginBase):
         self.channel = QWebChannel()
         self.channel.registerObject("backend", self.backend)
 
-        self.initUI()
+        self.__initUI()
 
-    def initUI(self):
+    def __initUI(self):
         self.web_view = QWebEngineView()
         self.web_view.page().setWebChannel(self.channel)
 

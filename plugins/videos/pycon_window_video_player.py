@@ -26,9 +26,9 @@ class PyConWindowVideoPlayer(PyConPluginBase):
         self.video_time_msec = 0
         self.cap = None
 
-        self.initUI(file_path=params.video_name)
+        self.__initUI(file_path=params.video_name)
 
-    def initUI(self, file_path):
+    def __initUI(self, file_path):
         self.win_widget = QWidget()
         self.setWidget(self.win_widget)
         self.layout = QVBoxLayout(self.win_widget)

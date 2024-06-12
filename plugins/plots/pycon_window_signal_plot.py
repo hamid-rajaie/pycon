@@ -31,9 +31,9 @@ class PyConWindowSignalPlot(PyConPluginBase):
         self.highlighted_plot_lines = {}
         self.current_time_msec = None
 
-        self.initUI()
+        self.__initUI()
 
-    def initUI(self):
+    def __initUI(self):
         self.widget_1 = QWidget()
         self.widget_1_layout = QGridLayout(self.widget_1)
 

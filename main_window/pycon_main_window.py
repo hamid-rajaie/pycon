@@ -183,8 +183,6 @@ class PyConMainWindow(QMainWindow):
         _dir: str = self.settings.value("open_dir", "")
         self.settings.endGroup()
 
-        logger().info(f"open dir : {_dir}")
-
         dlg = QFileDialog(directory=_dir)
 
         dlg.setNameFilters(get_pycon_config().pycon_start_dir_filter)
