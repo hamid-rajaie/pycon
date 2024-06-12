@@ -1,0 +1,4 @@
+#!/bin/bash
+
+source ~/.venv/pycon/Scripts/activate
+python -m pycon

@@ -1,0 +1,14 @@
+sphinx<7.0.0
+sphinx-autobuild
+sphinx-autodoc-typehints
+sphinxcontrib-runcmd
+sphinxcontrib.asciinema
+sphinx-inline-tabs
+sphinx-copybutton
+sphinx_rtd_theme
+sphinx-toolbox
+sphinx_new_tab_link
+myst-parser
+jsx-lexer
+pygments>=2.7
+sphinxemoji

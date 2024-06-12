@@ -1,0 +1,9 @@
+asammdf
+click
+matplotlib
+numpy
+opencv-python
+PyQtWebEngine
+pyqt5
+
+

@@ -1,0 +1,5 @@
+[flake8]
+# Disable all pycodestyle checks
+ignore = E, W
+# Set the maximum McCabe complexity
+max-complexity = 10

@@ -1,0 +1,47 @@
+.idea/
+**/.idea/
+**.pyc
+
+#python virtual environment
+venv/
+
+# dont upload database configs, they might contain passwords
+.pycon_configs/
+
+pycon_settings.ini
+
+# plotly graphs
+**.plotly
+
+.pytest_cache/
+
+# temporary files of office
+**/~$*
+
+# Logfiles
+*.log
+
+# Logfiles from file rotation
+*.log.*
+
+*.mp4
+
+# jenkins unit test report
+#reports/
+
+tools/jupyter_map_gps/osmnx/input
+tools/jupyter_map_gps/osmnx/output
+
+# Jupyter Notebook Checkpoints
+*.ipynb*
+
+# cProfile output
+*.prof
+
+# Pickle bytestreams
+*.pkl
+
+# MDF files
+*.mdf
+*.mf4
+
