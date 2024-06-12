@@ -4,7 +4,7 @@ from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
 
 
-class PicardWindowPlugin_1(PyConPluginBase):
+class PyConWindowPlugin_1(PyConPluginBase):
 
     def __init__(self, params: PyConPluginParams):
         super().__init__()

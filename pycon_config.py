@@ -53,6 +53,10 @@ class PyConConfig:
                 "plugin_package": "plugins.tables",
                 "plugin_dir": "C:\\develop\\pycon\\plugins\\tables",
             },
+            {
+                "plugin_package": "plugins.plots",
+                "plugin_dir": "C:\\develop\\pycon\\plugins\\plots",
+            },
         ]
 
 
