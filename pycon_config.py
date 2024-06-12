@@ -60,6 +60,10 @@ class PyConConfig:
                 "plugin_package": "plugins.geo_maps",
                 "plugin_dir": "C:\\develop\\pycon\\plugins\\geo_maps",
             },
+            {
+                "plugin_package": "plugins.web",
+                "plugin_dir": "C:\\develop\\pycon\\plugins\\web",
+            },
         ]
 
 

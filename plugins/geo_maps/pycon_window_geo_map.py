@@ -13,7 +13,6 @@ from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
 from common.pycon_numpy import find_nearest_time
-from data_sources.pycon_data_source import PyConDataSource
 from plugins.geo_maps.controls.pycon_folium_click import PyConFoliumClick
 from pycon_config import get_pycon_config
 
