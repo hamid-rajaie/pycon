@@ -1,5 +1,8 @@
 asammdf
+branca
 click
+folium
+jinja2
 matplotlib
 numpy
 opencv-python

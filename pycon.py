@@ -2,6 +2,7 @@ import sys
 
 sys.path.append("../../")
 
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QApplication
 
 from main_window.pycon_main_window import PyConMainWindow

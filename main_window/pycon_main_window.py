@@ -33,6 +33,8 @@ class PyConMainWindow(QMainWindow):
 
         uic.loadUi("main_window/pycon_main_window.ui", self)
 
+        self.open_dir = None
+
         settings_file_path = "pycon_settings.ini"
         self.settings = QSettings(settings_file_path, QSettings.IniFormat)
         self.settings.setFallbacksEnabled(False)
@@ -65,6 +67,11 @@ class PyConMainWindow(QMainWindow):
         self.show()
 
     def closeEvent(self, e):
+
+        self.settings.beginGroup("config")
+        self.settings.setValue("open_dir", self.open_dir)
+        self.settings.endGroup()
+
         self.settings.beginGroup("PyConMainWindow")
         self.settings.setValue("geometry", self.geometry())
         self.settings.endGroup()
@@ -172,7 +179,13 @@ class PyConMainWindow(QMainWindow):
             self.settings.endGroup()
 
     def open_file(self):
-        dlg = QFileDialog(directory=get_pycon_config().pycon_start_dir)
+        self.settings.beginGroup("config")
+        _dir: str = self.settings.value("open_dir", "")
+        self.settings.endGroup()
+
+        logger().info(f"open dir : {_dir}")
+
+        dlg = QFileDialog(directory=_dir)
 
         dlg.setNameFilters(get_pycon_config().pycon_start_dir_filter)
         dlg.selectNameFilter(get_pycon_config().pycon_start_dir_filter_selected)
@@ -181,6 +194,7 @@ class PyConMainWindow(QMainWindow):
             filenames = dlg.selectedFiles()
             selected_file_name = filenames[0]
             file_basename = os.path.basename(selected_file_name)
+            self.open_dir = os.path.dirname(selected_file_name)
             file_basename_no_ext, file_basename_ext = os.path.splitext(file_basename)
 
             # ==================================================

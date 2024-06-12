@@ -22,7 +22,6 @@ class PyConConfig:
         # ======================================================================
         #
         # ======================================================================
-        self.pycon_start_dir = "C:\\develop\\pycon\\generators\\csv_generators\\csv_gen_0000\output"
 
         self.pycon_start_dir_filter = ["CSV Files (*.csv)", "CanAPE (*.mf4)"]
         self.pycon_start_dir_filter_selected = self.pycon_start_dir_filter[0]
@@ -56,6 +55,10 @@ class PyConConfig:
             {
                 "plugin_package": "plugins.plots",
                 "plugin_dir": "C:\\develop\\pycon\\plugins\\plots",
+            },
+            {
+                "plugin_package": "plugins.geo_maps",
+                "plugin_dir": "C:\\develop\\pycon\\plugins\\geo_maps",
             },
         ]
 
