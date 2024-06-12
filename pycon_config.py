@@ -49,6 +49,10 @@ class PyConConfig:
                 "plugin_package": "plugins.videos",
                 "plugin_dir": "C:\\develop\\pycon\\plugins\\videos",
             },
+            {
+                "plugin_package": "plugins.tables",
+                "plugin_dir": "C:\\develop\\pycon\\plugins\\tables",
+            },
         ]
 
 
