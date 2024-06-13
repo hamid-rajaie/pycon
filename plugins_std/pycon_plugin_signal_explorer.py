@@ -11,7 +11,7 @@ from data_sources.pycon_data_source import PyConDataSource
 from data_sources.pycon_standard_item import PyConStandardItem
 
 
-class PyConWindowSignalExplorer(PyConPluginBase):
+class PyConPluginSignalExplorer(PyConPluginBase):
     # ==================================================
     # SIGNALS
     # ==================================================
@@ -22,7 +22,7 @@ class PyConWindowSignalExplorer(PyConPluginBase):
 
         self.pycon_data_source = pycon_data_source
 
-        uic.loadUiType("plugins_std/pycon_window_signal_explorer.ui", self)
+        uic.loadUiType("plugins_std/pycon_plugin_signal_explorer.ui", self)
         self.setWindowTitle("Signal Explorer")
         #
         # read csv

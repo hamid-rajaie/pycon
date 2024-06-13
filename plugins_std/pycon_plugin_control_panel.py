@@ -12,7 +12,7 @@ from plugins_std.pycon_time import PyConTime
 from pycon_config import get_pycon_config
 
 
-class PyConWindowControlPanel(PyConPluginBase):
+class PyConPluginControlPanel(PyConPluginBase):
     # ==================================================
     # SIGNALS
     # ==================================================
@@ -21,7 +21,7 @@ class PyConWindowControlPanel(PyConPluginBase):
     def __init__(self):
         super().__init__()
 
-        uic.loadUiType("plugins_std/pycon_window_control_panel.ui", self)
+        uic.loadUiType("plugins_std/pycon_plugin_control_panel.ui", self)
         self.setWindowTitle("Control Panel")
 
         self.int_min: int = 0

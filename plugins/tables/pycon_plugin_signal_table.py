@@ -78,7 +78,7 @@ class PyConWindowSignalTable(PyConPluginBase):
     def __init__(self, params: PyConPluginParams):
         super().__init__()
 
-        uic.loadUiType("plugins/tables/pycon_window_signal_table.ui", self)
+        uic.loadUiType("plugins/tables/pycon_plugin_signal_table.ui", self)
 
         self.df = params.pycon_data_source
 

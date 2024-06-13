@@ -19,7 +19,7 @@ class PyConWindowSignalPlot(PyConPluginBase):
     def __init__(self, params: PyConPluginParams):
         super().__init__()
 
-        uic.loadUiType("plugins/plots/pycon_window_signal_plot.ui", self)
+        uic.loadUiType("plugins/plots/pycon_plugin_signal_plot.ui", self)
         self.setWindowTitle("Signal Plot")
 
         self.widget_1 = None

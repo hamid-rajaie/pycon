@@ -31,36 +31,39 @@ class PyConConfig:
 
         self.pycon_plugins_cfg = [
             {
-                "plugin_package": "plugins",
-                "plugin_dir": "C:\\develop\\pycon\\plugins",
-            },
-            {
                 "plugin_package": "plugins.templates",
                 "plugin_dir": "C:\\develop\\pycon\\plugins\\templates",
+                "plugin_menu_group": "Templates",
             },
             {
                 "plugin_package": "plugins.videos",
                 "plugin_dir": "C:\\develop\\pycon\\plugins\\videos",
+                "plugin_menu_group": "Videos",
             },
             {
                 "plugin_package": "plugins.tables",
                 "plugin_dir": "C:\\develop\\pycon\\plugins\\tables",
+                "plugin_menu_group": "Tables",
             },
             {
                 "plugin_package": "plugins.plots",
                 "plugin_dir": "C:\\develop\\pycon\\plugins\\plots",
+                "plugin_menu_group": "Plots",
             },
             {
                 "plugin_package": "plugins.geo_maps",
                 "plugin_dir": "C:\\develop\\pycon\\plugins\\geo_maps",
+                "plugin_menu_group": "Geo Maps",
             },
             {
                 "plugin_package": "plugins.web",
                 "plugin_dir": "C:\\develop\\pycon\\plugins\\web",
+                "plugin_menu_group": "Web",
             },
             {
                 "plugin_package": "plugins.top_view",
                 "plugin_dir": "C:\\develop\\pycon\\plugins\\top_view",
+                "plugin_menu_group": "Top View",
             },
         ]
 

@@ -15,15 +15,14 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
-from common.pycon_std_panels import PyConStdPanels
+from common.pycon_std_plugins import PyConStdPlugins
 from data_sources.pycon_data_source_csv import PyConDataSourceCsv
 from data_sources.pycon_data_source_mdf import PyConDataSourceMdf
 from main_window.pycon_main_window_dialog_about import PyConAboutDialog
-from plugins_std.pycon_window_control_panel import PyConWindowControlPanel
-from plugins_std.pycon_window_signal_explorer import PyConWindowSignalExplorer
+from plugins_std.pycon_plugin_control_panel import PyConPluginControlPanel
+from plugins_std.pycon_plugin_signal_explorer import PyConPluginSignalExplorer
 from pycon_config import get_pycon_config
 
 
@@ -34,6 +33,8 @@ class PyConMainWindow(QMainWindow):
         uic.loadUi("main_window/pycon_main_window.ui", self)
 
         self.open_dir = None
+
+        self.menu_groups = {}
 
         settings_file_path = "pycon_settings.ini"
         self.settings = QSettings(settings_file_path, QSettings.IniFormat)
@@ -75,24 +76,24 @@ class PyConMainWindow(QMainWindow):
         tab = self.tab_widget.currentWidget()
 
         if tab is not None and tab.std_plugins is not None:
-            std_plugins: PyConStdPanels = tab.std_plugins
+            std_plugins: PyConStdPlugins = tab.std_plugins
 
-            for _, obj in std_plugins.__dict__.items():
-                if isinstance(obj, QMdiSubWindow):
-                    self.settings.beginGroup(obj.windowTitle())
-                    self.settings.setValue("visible", obj.isVisible())
-                    self.settings.setValue("geometry", obj.geometry())
-                    self.settings.endGroup()
-
-        if tab is not None and tab.plugins is not None:
-            plugins = tab.plugins
-
-            for plugin in plugins:
+            for _, plugin in std_plugins.__dict__.items():
                 if isinstance(plugin, QMdiSubWindow):
                     self.settings.beginGroup(plugin.windowTitle())
                     self.settings.setValue("visible", plugin.isVisible())
                     self.settings.setValue("geometry", plugin.geometry())
                     self.settings.endGroup()
+
+        if tab is not None and tab.plugins is not None:
+            plugins = tab.plugins
+            for plugin_menu_group, list_plugins in plugins.items():
+                for plugin in list_plugins:
+                    if isinstance(plugin, QMdiSubWindow):
+                        self.settings.beginGroup(plugin.windowTitle())
+                        self.settings.setValue("visible", plugin.isVisible())
+                        self.settings.setValue("geometry", plugin.geometry())
+                        self.settings.endGroup()
 
     def create_menu_bar(self):
         action_open = QAction("Open...", self)
@@ -104,31 +105,35 @@ class PyConMainWindow(QMainWindow):
 
         menu_bar = self.menuBar()
 
-        file_menu = QMenu("&File", self)
-        menu_bar.addMenu(file_menu)
-        file_menu.addAction(action_open)
+        menu_file = QMenu("&File", self)
+        menu_bar.addMenu(menu_file)
+        menu_file.addAction(action_open)
 
-        file_menu.addSeparator()
-        file_menu.addAction(action_exit)
+        menu_file.addSeparator()
+        menu_file.addAction(action_exit)
 
-        file_wins = QMenu("&Windows", self)
-        menu_bar.addMenu(file_wins)
+        menu_plugins = QMenu("&Plugins", self)
+        menu_bar.addMenu(menu_plugins)
 
-        help_menu = menu_bar.addMenu("&Help")
-        help_menu.addAction(action_about)
+        menu_help = menu_bar.addMenu("&Help")
+        menu_help.addAction(action_about)
 
-        self.file_wins = file_wins
+        self.menu_plugins = menu_plugins
 
     def about(self):
         dialog = PyConAboutDialog()
         dialog.exec_()
 
     def discover_plugins(self, params: PyConPluginParams):
-        plugins = []
+        plugins = {}
 
         for plugin_cfg in get_pycon_config().pycon_plugins_cfg:
             plugin_package = plugin_cfg["plugin_package"]
             plugin_dir = plugin_cfg["plugin_dir"]
+            plugin_menu_group = plugin_cfg["plugin_menu_group"]
+
+            if plugin_menu_group not in self.menu_groups.keys():
+                plugins[plugin_menu_group] = []
 
             if os.path.isdir(plugin_dir):
                 for file_name in os.listdir(plugin_dir):
@@ -136,38 +141,38 @@ class PyConMainWindow(QMainWindow):
                         module_name = file_name[:-3]
                         module = importlib.import_module(name=f".{module_name}", package=plugin_package)
                         for item_name in dir(module):
-                            # logger().info(f"... item_name:{item_name}")
                             item = getattr(module, item_name)
                             if (
                                 (isinstance(item, type))
                                 and issubclass(item, PyConPluginBase)
                                 and item != PyConPluginBase
                             ):
-                                plugins.append(item(params))
+                                plugins[plugin_menu_group].append(item(params))
 
         return plugins
 
-    def init_plugin(self, tab_mdi_area, obj):
-        if isinstance(obj, QMdiSubWindow):
-            self.settings.beginGroup(obj.windowTitle())
+    def init_plugin(self, tab_mdi_area, plugin, parent_menu):
+        if isinstance(plugin, QMdiSubWindow):
+            self.settings.beginGroup(plugin.windowTitle())
             visible: bool = self.settings.value("visible", False, type=bool)
             geometry: QRect = self.settings.value("geometry", QRect(0, 0, 400, 400))
 
-            obj.setGeometry(geometry)
+            plugin.setGeometry(geometry)
 
-            tab_mdi_area.addSubWindow(obj)
+            tab_mdi_area.addSubWindow(plugin)
 
-            def lambda_generator(obj):
-                return lambda: obj.show()
+            def lambda_generator(plugin):
+                return lambda: plugin.show()
 
-            action = QAction(obj.windowTitle(), self)
-            action.triggered.connect(lambda_generator(obj))
-            self.file_wins.addAction(action)
+            action = QAction(plugin.windowTitle(), self)
+            action.triggered.connect(lambda_generator(plugin))
+
+            parent_menu.addAction(action)
 
             if visible:
-                obj.show()
+                plugin.show()
             else:
-                obj.hide()
+                plugin.hide()
 
             self.settings.endGroup()
 
@@ -221,11 +226,11 @@ class PyConMainWindow(QMainWindow):
             # ==================================================================
             # create std_plugins
             # ==================================================================
-            std_plugins = PyConStdPanels()
+            std_plugins = PyConStdPlugins()
             tab.std_plugins = std_plugins
 
-            std_plugins.win_control_panel = PyConWindowControlPanel()
-            std_plugins.win_signal_explorer = PyConWindowSignalExplorer(
+            std_plugins.plugin_control_panel = PyConPluginControlPanel()
+            std_plugins.plugin_signal_explorer = PyConPluginSignalExplorer(
                 pycon_data_source=plugin_params.pycon_data_source
             )
             # ==================================================================
@@ -236,38 +241,47 @@ class PyConMainWindow(QMainWindow):
             # ==================================================================
             # init plugins
             # ==================================================================
-            for _, obj in std_plugins.__dict__.items():
-                self.init_plugin(tab_mdi_area=tab_mdi_area, obj=obj)
+            menu_grp = QMenu("&Standard", self)
+            self.menu_plugins.addMenu(menu_grp)
+            self.menu_groups["std"] = menu_grp
+            for _, plugin in std_plugins.__dict__.items():
+                self.init_plugin(tab_mdi_area=tab_mdi_area, plugin=plugin, parent_menu=menu_grp)
 
-            for plugin in plugins:
-                self.init_plugin(tab_mdi_area=tab_mdi_area, obj=plugin)
+            for plugin_menu_group, list_plugins in plugins.items():
+                menu_grp = QMenu(plugin_menu_group, self)
+                self.menu_plugins.addMenu(menu_grp)
+                self.menu_groups[plugin_menu_group] = menu_grp
+
+                for plugin in list_plugins:
+                    self.init_plugin(tab_mdi_area=tab_mdi_area, plugin=plugin, parent_menu=menu_grp)
             # ==================================================
-            # connect win_signal_explorer to win_control_panel
+            # connect plugin_signal_explorer to plugin_control_panel
             # ==================================================
-            std_plugins.win_signal_explorer.signal_explorer_double_click.connect(
-                std_plugins.win_control_panel.slot_add_signal_by_double_click
+            std_plugins.plugin_signal_explorer.signal_explorer_double_click.connect(
+                std_plugins.plugin_control_panel.slot_add_signal_by_double_click
             )
             # ==================================================================
             # add connections
             # connect std panels to plugins
             # ==================================================================
-            for plugin in plugins:
-                if isinstance(plugin, QMdiSubWindow):
+            for plugin_menu_group, list_plugins in plugins.items():
+                for plugin in list_plugins:
+                    if isinstance(plugin, QMdiSubWindow):
 
-                    def lambda_generator(plugin):
-                        return obj.slot_add_signal_by_double_click
+                        def lambda_generator(plugin):
+                            return plugin.slot_add_signal_by_double_click
 
-                    # ==================================================================
-                    # connect : win_signal_explorer   signal_explorer_double_click
-                    # to      : plugin                slot_add_signal_by_double_click
-                    # ==================================================================
-                    std_plugins.win_signal_explorer.signal_explorer_double_click.connect(
-                        plugin.slot_add_signal_by_double_click
-                    )
-                    # ==================================================================
-                    # connect : win_control_panel   control_panel_slider_value_changed
-                    # to      : plugin              slider_value_changed
-                    # ==================================================================
-                    std_plugins.win_control_panel.control_panel_slider_value_changed.connect(
-                        plugin.slider_value_changed
-                    )
+                        # ==================================================================
+                        # connect : plugin_signal_explorer   signal_explorer_double_click
+                        # to      : plugin                slot_add_signal_by_double_click
+                        # ==================================================================
+                        std_plugins.plugin_signal_explorer.signal_explorer_double_click.connect(
+                            plugin.slot_add_signal_by_double_click
+                        )
+                        # ==================================================================
+                        # connect : plugin_control_panel   control_panel_slider_value_changed
+                        # to      : plugin              slider_value_changed
+                        # ==================================================================
+                        std_plugins.plugin_control_panel.control_panel_slider_value_changed.connect(
+                            plugin.slider_value_changed
+                        )

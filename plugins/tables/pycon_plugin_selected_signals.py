@@ -16,7 +16,7 @@ class PyConWindowSelectedSignals(PyConPluginBase):
     def __init__(self, params: PyConPluginParams):
         super().__init__()
 
-        uic.loadUiType("plugins/tables/pycon_window_selected_signals.ui", self)
+        uic.loadUiType("plugins/tables/pycon_plugin_selected_signals.ui", self)
         self.setWindowTitle("Selected Signals")
         #
         # read csv

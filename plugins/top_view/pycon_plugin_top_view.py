@@ -22,7 +22,7 @@ class PyConWindowTopView(PyConPluginBase):
     def __init__(self, params: PyConPluginParams):
         super().__init__()
 
-        uic.loadUiType("plugins/top_view/pycon_window_top_view.ui", self)
+        uic.loadUiType("plugins/top_view/pycon_plugin_top_view.ui", self)
         self.setWindowTitle("Top View")
         self.resize(500, 700)
 

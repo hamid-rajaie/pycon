@@ -20,7 +20,7 @@ class PyConWindowWeb(PyConPluginBase):
     def __init__(self, params: PyConPluginParams):
         super().__init__()
 
-        uic.loadUiType("plugins/web/pycon_window_web.ui", self)
+        uic.loadUiType("plugins/web/pycon_plugin_web.ui", self)
         self.setWindowTitle("Web")
 
         self.win_widget = None

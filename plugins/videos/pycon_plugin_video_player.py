@@ -16,7 +16,7 @@ class PyConWindowVideoPlayer(PyConPluginBase):
     def __init__(self, params: PyConPluginParams):
         super().__init__()
 
-        uic.loadUiType("plugins/videos/pycon_window_video_player.ui", self)
+        uic.loadUiType("plugins/videos/pycon_plugin_video_player.ui", self)
         self.setWindowTitle("Video Player")
 
         self.win_widget = None

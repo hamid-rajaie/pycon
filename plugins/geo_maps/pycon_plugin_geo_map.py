@@ -22,7 +22,7 @@ class Backend(QObject):
         print(f"Data received: {data}")
 
 
-class PyConWindowGeoMap(PyConPluginBase):
+class PyConPluginGeoMap(PyConPluginBase):
     """
     lon_wgs84: INS_Long_Abs
     lat_wgs84: INS_Lat_Abs
@@ -38,7 +38,7 @@ class PyConWindowGeoMap(PyConPluginBase):
 
         self.pycon_data_source = params.pycon_data_source
 
-        uic.loadUiType("plugins/geo_maps/pycon_window_geo_map.ui", self)
+        uic.loadUiType("plugins/geo_maps/pycon_plugin_geo_map.ui", self)
         self.setWindowTitle("Geo Map")
 
         self.win_widget = None
