@@ -26,12 +26,6 @@ class PyConConfig:
         self.pycon_start_dir_filter = ["CSV Files (*.csv)", "CanAPE (*.mf4)"]
         self.pycon_start_dir_filter_selected = self.pycon_start_dir_filter[0]
 
-        self.pycon_bg_color = None  # "black"
-        self.pycon_bg_color_tabs = None  # "lightgrey"
-        self.pycon_bg_color_tab = None  # "lightgrey"
-        self.pycon_bg_color_tab_mdi = None  # QBrush(Qt.white)
-        self.pycon_bg_color_tab_sub_win = None  # "lightgrey"
-
         # convert sec to msec
         self.pycon_conversion_factor__time_sec_to_msec = 1000
 

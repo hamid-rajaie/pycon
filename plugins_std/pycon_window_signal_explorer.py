@@ -1,17 +1,8 @@
 import numpy as np
 from PyQt5 import QtCore, uic
-from PyQt5.Qt import QColor, QFont, QStandardItem, QStandardItemModel
 from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import (
-    QHeaderView,
-    QMdiSubWindow,
-    QMenu,
-    QTableWidget,
-    QTableWidgetItem,
-    QTreeView,
-    QVBoxLayout,
-    QWidget,
-)
+from PyQt5.QtGui import QStandardItemModel
+from PyQt5.QtWidgets import QHeaderView, QMenu, QTableWidget, QTableWidgetItem, QTreeView, QVBoxLayout, QWidget
 
 from common.delegates.pycon_window_signal_explorer_delegate import PyConWindowSignalExplorerDelegate
 from common.logging.logger import logger

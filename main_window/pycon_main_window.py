@@ -47,15 +47,11 @@ class PyConMainWindow(QMainWindow):
 
         self.setWindowTitle("PyCon")
         self.setGeometry(main_window_geometry)
-
-        if get_pycon_config().pycon_bg_color is not None:
-            self.setStyleSheet(f"background-color: {get_pycon_config().pycon_bg_color};")
         #
         # add tab widget
         #
         self.tab_widget = QTabWidget()
-        if get_pycon_config().pycon_bg_color_tabs is not None:
-            self.tab_widget.setStyleSheet(f"background-color: {get_pycon_config().pycon_bg_color_tabs};")
+
         self.tab_widget.setTabsClosable(True)
         self.tab_widget.tabCloseRequested.connect(lambda index: self.tab_widget.removeTab(index))
         self.setCentralWidget(self.tab_widget)
@@ -159,9 +155,6 @@ class PyConMainWindow(QMainWindow):
 
             obj.setGeometry(geometry)
 
-            if get_pycon_config().pycon_bg_color_tab_sub_win is not None:
-                obj.setStyleSheet(f"background-color: {get_pycon_config().pycon_bg_color_tab_sub_win};")
-
             tab_mdi_area.addSubWindow(obj)
 
             def lambda_generator(obj):
@@ -207,10 +200,9 @@ class PyConMainWindow(QMainWindow):
             # add tab
             # ==================================================
             tab_mdi_area = QMdiArea()
-            # tab_mdi_area.setBackground(get_pycon_config().pycon_bg_color_tab_mdi)
+
             tab = QWidget()
-            if get_pycon_config().pycon_bg_color_tab is not None:
-                tab.setStyleSheet(f"background-color: {get_pycon_config().pycon_bg_color_tab};")
+
             self.tab_widget.addTab(tab, file_basename)
             self.tab_widget.setCurrentWidget(tab)
 
@@ -224,8 +216,6 @@ class PyConMainWindow(QMainWindow):
             # ==================================================================
             plugin_params = PyConPluginParams(
                 selected_file_name=selected_file_name,
-                tab=tab,
-                tab_mdi_area=tab_mdi_area,
                 pycon_data_source=pycon_data_source,
             )
             # ==================================================================

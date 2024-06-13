@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import gridspec, rc, rcParams
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -6,7 +5,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 from matplotlib.figure import Figure
 from PyQt5 import QtCore, uic
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGridLayout, QMdiSubWindow, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QGridLayout, QVBoxLayout, QWidget
 
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase

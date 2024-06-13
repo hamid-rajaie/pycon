@@ -1,12 +1,9 @@
 import numpy as np
-import pandas
-import pandas as pd
 from PyQt5 import QtCore, QtGui, uic
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QHeaderView, QMdiSubWindow, QMenu, QTableView, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QTableView, QVBoxLayout, QWidget
 
 from common.delegates.pycon_window_read_only_delegate import PyConWindowReadOnlyDelegate
-from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
 

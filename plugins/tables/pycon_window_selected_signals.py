@@ -1,7 +1,7 @@
 import numpy as np
 from PyQt5 import QtCore, uic
-from PyQt5.Qt import QStandardItemModel
-from PyQt5.QtWidgets import QMdiSubWindow, QMenu, QTreeView, QVBoxLayout, QWidget
+from PyQt5.QtGui import QStandardItemModel
+from PyQt5.QtWidgets import QMenu, QTreeView, QVBoxLayout, QWidget
 
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
@@ -9,7 +9,6 @@ from common.plugins.pycon_plugin_params import PyConPluginParams
 from common.pycon_numpy import find_nearest_time
 from data_sources.pycon_standard_item import PyConStandardItem
 from plugins_std.pycon_time import PyConTime
-from pycon_config import get_pycon_config
 
 
 class PyConWindowSelectedSignals(PyConPluginBase):

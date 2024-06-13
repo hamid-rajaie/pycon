@@ -1,12 +1,9 @@
 import os
-from os import path
 
 import cv2
-import numpy as np
 from PyQt5 import QtCore, uic
-from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QLabel, QMdiSubWindow, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QLabel, QVBoxLayout, QWidget
 
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase

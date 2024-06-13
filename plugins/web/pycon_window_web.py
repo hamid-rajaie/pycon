@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, uic
+from PyQt5 import uic
 from PyQt5.QtCore import QEvent, QObject, QUrl, pyqtSlot
 from PyQt5.QtWebChannel import QWebChannel
 from PyQt5.QtWebEngineWidgets import QWebEngineView

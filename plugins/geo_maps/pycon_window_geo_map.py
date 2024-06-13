@@ -1,7 +1,6 @@
 import io
 
 import folium
-from branca.element import Element, Figure, JavascriptLink, MacroElement
 from jinja2 import Template
 from PyQt5 import QtCore, uic
 from PyQt5.QtCore import QObject, pyqtSlot
@@ -15,7 +14,6 @@ from common.plugins.pycon_plugin_params import PyConPluginParams
 from common.pycon_numpy import find_nearest_time
 from plugins.geo_maps.controls.pycon_folium_click import PyConFoliumClick
 from plugins_std.pycon_time import PyConTime
-from pycon_config import get_pycon_config
 
 
 class Backend(QObject):
