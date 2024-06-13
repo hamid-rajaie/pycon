@@ -33,7 +33,7 @@ class PyConConfig:
         self.pycon_bg_color_tab_sub_win = None  # "lightgrey"
 
         # convert sec to msec
-        self.pycon_conversion_factor__time = 1000
+        self.pycon_conversion_factor__time_sec_to_msec = 1000
 
         self.pycon_plugins_cfg = [
             {

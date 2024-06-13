@@ -199,10 +199,10 @@ class PyConMainWindow(QMainWindow):
             # Data Source
             # ==================================================
             if file_basename_ext == ".csv":
-                pycon_app_data_source = PyConDataSourceCsv(file_name=selected_file_name)
+                pycon_data_source = PyConDataSourceCsv(file_name=selected_file_name)
 
             if file_basename_ext in [".mf4", ".MF4"]:
-                pycon_app_data_source = PyConDataSourceMdf(file_name=selected_file_name)
+                pycon_data_source = PyConDataSourceMdf(file_name=selected_file_name)
             # ==================================================
             # add tab
             # ==================================================
@@ -222,11 +222,11 @@ class PyConMainWindow(QMainWindow):
             # ==================================================================
             # create params
             # ==================================================================
-            panel_params = PyConPluginParams(
+            plugin_params = PyConPluginParams(
                 selected_file_name=selected_file_name,
                 tab=tab,
                 tab_mdi_area=tab_mdi_area,
-                pycon_app_data_source=pycon_app_data_source,
+                pycon_data_source=pycon_data_source,
             )
             # ==================================================================
             # create std_plugins
@@ -236,12 +236,12 @@ class PyConMainWindow(QMainWindow):
 
             std_plugins.win_control_panel = PyConWindowControlPanel()
             std_plugins.win_signal_explorer = PyConWindowSignalExplorer(
-                pycon_app_data_source=panel_params.pycon_app_data_source
+                pycon_data_source=plugin_params.pycon_data_source
             )
             # ==================================================================
             # detect plugins
             # ==================================================================
-            plugins = self.discover_plugins(params=panel_params)
+            plugins = self.discover_plugins(params=plugin_params)
             tab.plugins = plugins
             # ==================================================================
             # init plugins

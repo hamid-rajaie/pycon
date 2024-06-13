@@ -15,7 +15,7 @@ class PyConTopViewClothoid(PyConTopViewPluginBase):
     def __init__(self, params: PyConTopViewParams):
         super().__init__(name="PyConTopViewClothoid")
 
-        self.pycon_app_data_source = params.pycon_app_data_source
+        self.pycon_data_source = params.pycon_data_source
 
     def load_signals(self):
         try:
@@ -27,13 +27,13 @@ class PyConTopViewClothoid(PyConTopViewPluginBase):
             startPositionX = f"videoLines.{line}.startPositionX"
             lookAheadDistance = f"videoLines.{line}.lookAheadDistance"
 
-            self.time = self.pycon_app_data_source.get_channel(channel_name="timestamp")
-            self.latDeviation = self.pycon_app_data_source.get_channel(channel_name=latDeviation)
-            self.curvature = self.pycon_app_data_source.get_channel(channel_name=curvature)
-            self.curvatureChange = self.pycon_app_data_source.get_channel(channel_name=curvatureChange)
-            self.headingAngle = self.pycon_app_data_source.get_channel(channel_name=headingAngle)
-            self.startPositionX = self.pycon_app_data_source.get_channel(channel_name=startPositionX)
-            self.lookAheadDistance = self.pycon_app_data_source.get_channel(channel_name=lookAheadDistance)
+            self.time = self.pycon_data_source.get_channel(channel_name="timestamp")
+            self.latDeviation = self.pycon_data_source.get_channel(channel_name=latDeviation)
+            self.curvature = self.pycon_data_source.get_channel(channel_name=curvature)
+            self.curvatureChange = self.pycon_data_source.get_channel(channel_name=curvatureChange)
+            self.headingAngle = self.pycon_data_source.get_channel(channel_name=headingAngle)
+            self.startPositionX = self.pycon_data_source.get_channel(channel_name=startPositionX)
+            self.lookAheadDistance = self.pycon_data_source.get_channel(channel_name=lookAheadDistance)
 
             self.internal_status = True
 

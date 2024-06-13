@@ -8,6 +8,7 @@ from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
 from common.pycon_numpy import find_nearest_time
 from data_sources.pycon_standard_item import PyConStandardItem
+from plugins_std.pycon_time import PyConTime
 from pycon_config import get_pycon_config
 
 
@@ -123,9 +124,10 @@ class PyConWindowSelectedSignals(PyConPluginBase):
             "std_item_val": std_item_val,
         }
 
-    @QtCore.pyqtSlot(int, int)
-    def slider_value_changed(self, time_msec, time_diff_sec):
-        time_sec = time_msec / get_pycon_config().pycon_conversion_factor__time
+    @QtCore.pyqtSlot(PyConTime)
+    def slider_value_changed(self, time: PyConTime):
+
+        time_sec = time.get_time_sec()
 
         for group_index, group in self.selected_signals.items():
             for channel_index, channel in group.items():

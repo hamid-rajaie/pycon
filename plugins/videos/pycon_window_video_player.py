@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QLabel, QMdiSubWindow, QVBoxLayout, QWidget
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
+from plugins_std.pycon_time import PyConTime
 
 
 class PyConWindowVideoPlayer(PyConPluginBase):
@@ -47,13 +48,15 @@ class PyConWindowVideoPlayer(PyConPluginBase):
             self.cap = cv2.VideoCapture(file_path)
             # self.setWindowTitle(f"Video Player - {path.basename(file_path)}")
 
-            self.slider_value_changed(0, 0)
+            self.slider_value_changed(PyConTime(0, 0, PyConTime.PyConTimeUnit.M_SEC))
         else:
             logger().warning("video file not found")
 
-    @QtCore.pyqtSlot(int, int)
-    def slider_value_changed(self, time_msec, time_diff_sec):
-        self.video_time_msec = time_diff_sec
+    @QtCore.pyqtSlot(PyConTime)
+    def slider_value_changed(self, time: PyConTime):
+
+        self.video_time_msec = time.get_time_diff_msec()
+
         self.__display_frame()
 
     def get_video_duration_sec(self):

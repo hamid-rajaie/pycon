@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QGridLayout, QMdiSubWindow, QVBoxLayout, QWidget
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
+from plugins_std.pycon_time import PyConTime
 from pycon_config import get_pycon_config
 
 
@@ -67,7 +68,7 @@ class PyConWindowSignalPlot(PyConPluginBase):
 
     @QtCore.pyqtSlot(int, int, str, np.ndarray, np.ndarray)
     def slot_add_signal_by_double_click(self, group_index, channel_index, channel_name, time, signal):
-        x_points = time * get_pycon_config().pycon_conversion_factor__time
+        x_points = time * get_pycon_config().pycon_conversion_factor__time_sec_to_msec
         y_points = signal
 
         try:
@@ -110,15 +111,15 @@ class PyConWindowSignalPlot(PyConPluginBase):
 
         return ax
 
-    @QtCore.pyqtSlot(int, int)
-    def slider_value_changed(self, time_msec, time_diff_sec):
+    @QtCore.pyqtSlot(PyConTime)
+    def slider_value_changed(self, time: PyConTime):
         """Updates or adds a vertical line at time_msec across all subplots."""
-        self.current_time_msec = time_msec  # Store current time_msec
+        self.current_time_msec = time.get_time_msec()
         self.__ensure_highlighted_lines()  # Ensure all subplots have a line
 
         # Update the position of the line in each subplot
         for ax, line in self.highlighted_plot_lines.items():
-            line.set_xdata([time_msec, time_msec])
+            line.set_xdata([time.time, time.time])
 
         self.canvas.draw()
 

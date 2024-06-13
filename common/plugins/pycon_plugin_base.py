@@ -4,6 +4,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMdiSubWindow
 
 from common.logging.logger import logger
+from plugins_std.pycon_time import PyConTime
 
 
 class PyConPluginBase(QMdiSubWindow):
@@ -26,6 +27,6 @@ class PyConPluginBase(QMdiSubWindow):
     def slot_add_signal_by_double_click(self, group_index, channel_index, channel_name, time, signal):
         pass
 
-    @QtCore.pyqtSlot(int, int)
-    def slider_value_changed(self, time_msec, time_diff_sec):
+    @QtCore.pyqtSlot(PyConTime)
+    def slider_value_changed(self, time: PyConTime):
         pass

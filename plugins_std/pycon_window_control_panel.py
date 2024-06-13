@@ -1,12 +1,14 @@
-from enum import Enum, IntEnum
+import sys
+import traceback
 
 import numpy as np
 from PyQt5 import QtCore, uic
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QHBoxLayout, QLineEdit, QMdiSubWindow, QSlider, QWidget
+from PyQt5.QtWidgets import QHBoxLayout, QLineEdit, QSlider, QWidget
 
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
+from plugins_std.pycon_time import PyConTime
 from pycon_config import get_pycon_config
 
 
@@ -14,17 +16,16 @@ class PyConWindowControlPanel(PyConPluginBase):
     # ==================================================
     # SIGNALS
     # ==================================================
-    control_panel_slider_value_changed = QtCore.pyqtSignal(int, int)
-
-    class RangeMode(IntEnum):
-        COMPARE = 0
-        NO_COMPARE = 1
+    control_panel_slider_value_changed = QtCore.pyqtSignal(PyConTime)
 
     def __init__(self):
         super().__init__()
 
         uic.loadUiType("plugins_std/pycon_window_control_panel.ui", self)
         self.setWindowTitle("Control Panel")
+
+        self.int_min: int = 0
+        self.int_max: int = 0
 
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setMinimum(0)
@@ -43,64 +44,60 @@ class PyConWindowControlPanel(PyConPluginBase):
         self.setWidget(self.slider_widget)
 
         self.slider.valueChanged.connect(self.on_slider_change)
-        self.slider_input.textChanged.connect(self.slider_input_changed)
+        self.slider_input.textChanged.connect(self.on_text_changed)
 
     @QtCore.pyqtSlot(int, int, str, np.ndarray, np.ndarray)
     def slot_add_signal_by_double_click(self, group_index, channel_index, channel_name, time, signal):
-        logger().warning("derived class")
-        self.set_slider_range(
-            min_time=time[0],
-            max_time=time[-1],
-            range_mode=PyConWindowControlPanel.RangeMode.COMPARE,
-        )
+        self.set_slider_range(min_time=time[0], max_time=time[-1])
 
-    @QtCore.pyqtSlot(float, float, RangeMode)
-    def set_slider_range(self, min_time: float, max_time: float, range_mode: RangeMode):
-        min = min_time * get_pycon_config().pycon_conversion_factor__time
-        max = max_time * get_pycon_config().pycon_conversion_factor__time
+    def set_slider_range(self, min_time: float, max_time: float):
+        logger().info(f"set slider range : [ {min_time}  {max_time} ]")
 
-        int_min = int(min)
-        int_max = int(max)
+        min: float = min_time * get_pycon_config().pycon_conversion_factor__time_sec_to_msec
+        max: float = max_time * get_pycon_config().pycon_conversion_factor__time_sec_to_msec
 
-        logger().info(f"new slider range : {int_min}:{int_max}")
+        __int_min: int = int(min)
+        __int_max: int = int(max)
+
+        diff: int = __int_max - __int_min
 
         try:
-            if range_mode == PyConWindowControlPanel.RangeMode.NO_COMPARE:
-                self.slider.setMinimum(int_min)
-                self.slider.setMaximum(int_max)
-                # self.has_range = True
+            if not self.has_range:
+                self.slider.setMinimum(0)
+                self.slider.setMaximum(diff)
+                self.has_range = True
+                self.int_min = __int_min
+                self.int_max = __int_max
             else:
-                if not self.has_range:
-                    self.slider.setMinimum(int_min)
-                    self.slider.setMaximum(int_max)
-                    self.has_range = True
-                else:
-                    if int_min < self.slider.minimum():
-                        logger().info(f"update min : {int_min}")
-                        self.slider.setMinimum(int_min)
-                    if int_max > self.slider.maximum():
-                        logger().info(f"update max : {int_max}")
-                        self.slider.setMaximum(int_max)
-        except Exception as ex:
-            logger().warning(str(ex))
-            logger().warning(f"min:{min} max:{max}")
-            logger().warning(f"int_min:{int_min} int_max:{int_max}")
+                if __int_min < self.int_min:
+                    self.int_min = __int_min
 
-    def set_value(self, value):
-        self.slider.setValue(value)
+                if __int_max > self.int_max:
+                    self.slider.setMaximum(diff)
+                    self.int_max = __int_max
+        except OverflowError as exc:
+            logger().error(str(exc))
+            logger().error(f"{traceback.print_exception(type(exc), exc, exc.__traceback__)}")
+            logger().error(f"min:{min} max:{max}")
+            logger().error(f"int_min:{self.int_min} int_max:{self.int_max}")
+        except Exception as exc:
+            logger().error(type(exc))
+            logger().error(str(exc))
+            logger().error(f"min:{min} max:{max}")
+            logger().error(f"int_min:{self.int_min} int_max:{self.int_max}")
 
-    def value(self):
-        return self.slider.value()
+    @QtCore.pyqtSlot(int)
+    def on_slider_change(self, slider_value):
 
-    def on_slider_change(self, value):
-        self.slider_input.setText(str(value))
+        value_abs: int = int(self.int_min + slider_value)
+        value_diff: int = int(slider_value)
 
-        value_diff = value - self.slider.minimum()
-        self.control_panel_slider_value_changed.emit(value, value_diff)
+        self.slider_input.setText(str(value_diff))
 
-    def slider_input_changed(self):
+        time = PyConTime(time=value_abs, time_diff=value_diff, unit=PyConTime.PyConTimeUnit.M_SEC)
+        self.control_panel_slider_value_changed.emit(time)
+
+    @QtCore.pyqtSlot(str)
+    def on_text_changed(self, text: str):
         input_text = self.slider_input.text()
-        if input_text in ["-", "+", ""]:
-            self.slider.setValue(0)
-        else:
-            self.slider.setValue(int(input_text))
+        self.slider.setValue(int(input_text))

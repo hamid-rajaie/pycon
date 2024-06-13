@@ -13,6 +13,7 @@ from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
 from plugins.top_view.plugins.common.pycon_top_view_params import PyConTopViewParams
 from plugins.top_view.plugins.common.pycon_top_view_plugin_base import PyConTopViewPluginBase
+from plugins_std.pycon_time import PyConTime
 from pycon_config import get_pycon_config
 
 
@@ -25,7 +26,7 @@ class PyConWindowTopView(PyConPluginBase):
         self.setWindowTitle("Top View")
         self.resize(500, 700)
 
-        self.pycon_app_data_source = params.pycon_app_data_source
+        self.pycon_data_source = params.pycon_data_source
 
         # self.internal_status = False
 
@@ -69,7 +70,7 @@ class PyConWindowTopView(PyConPluginBase):
         # ==================================================================
         # create params
         # ==================================================================
-        top_view_params = PyConTopViewParams(pycon_app_data_source=self.pycon_app_data_source)
+        top_view_params = PyConTopViewParams(pycon_data_source=self.pycon_data_source)
 
         self.plugins = self.discover_plugins(params=top_view_params)
 
@@ -150,10 +151,10 @@ class PyConWindowTopView(PyConPluginBase):
         self.widget_1_layout.addWidget(self.canvas)
         self.canvas.draw()
 
-    @QtCore.pyqtSlot(int, int)
-    def slider_value_changed(self, time_msec, time_diff_sec):
+    @QtCore.pyqtSlot(PyConTime)
+    def slider_value_changed(self, time: PyConTime):
 
-        time_sec = time_msec / get_pycon_config().pycon_conversion_factor__time
+        time_sec = time.get_time_sec()
 
         for plugin in self.plugins:
             plugin.draw(time_sec, self.plot_lines)

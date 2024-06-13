@@ -26,10 +26,10 @@ class PyConWindowSignalExplorer(PyConPluginBase):
     # ==================================================
     signal_explorer_double_click = QtCore.pyqtSignal(int, int, str, np.ndarray, np.ndarray)
 
-    def __init__(self, pycon_app_data_source: PyConDataSource):
+    def __init__(self, pycon_data_source: PyConDataSource):
         super().__init__()
 
-        self.pycon_app_data_source = pycon_app_data_source
+        self.pycon_data_source = pycon_data_source
 
         uic.loadUiType("plugins_std/pycon_window_signal_explorer.ui", self)
         self.setWindowTitle("Signal Explorer")
@@ -235,7 +235,7 @@ class PyConWindowSignalExplorer(PyConPluginBase):
 
         for sig_time in time_signals:
             try:
-                time = self.pycon_app_data_source.get_channel(
+                time = self.pycon_data_source.get_channel(
                     channel_name=sig_time, group_index=channel_group_index, channel_index=channel_index_timestamp
                 )
                 logger().info(f"{sig_time} found")
@@ -247,7 +247,7 @@ class PyConWindowSignalExplorer(PyConPluginBase):
             return
 
         try:
-            signal = self.pycon_app_data_source.get_channel(
+            signal = self.pycon_data_source.get_channel(
                 channel_name=channel_name, group_index=channel_group_index, channel_index=channel_index
             )
             #
@@ -270,7 +270,7 @@ class PyConWindowSignalExplorer(PyConPluginBase):
     def add_signals_to_tree_view(self):
         self.signal_tree_view.model().removeRows(0, self.signal_tree_view.model().rowCount())
 
-        for group_index, group in enumerate(self.pycon_app_data_source.pycon_app_data.groups):
+        for group_index, group in enumerate(self.pycon_data_source.pycon_app_data.groups):
             channel_group = group.channel_group
             channel_group_comment = channel_group.comment
 

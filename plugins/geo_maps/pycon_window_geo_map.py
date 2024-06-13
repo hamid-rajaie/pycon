@@ -14,6 +14,7 @@ from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
 from common.pycon_numpy import find_nearest_time
 from plugins.geo_maps.controls.pycon_folium_click import PyConFoliumClick
+from plugins_std.pycon_time import PyConTime
 from pycon_config import get_pycon_config
 
 
@@ -37,7 +38,7 @@ class PyConWindowGeoMap(PyConPluginBase):
     def __init__(self, params: PyConPluginParams):
         super().__init__()
 
-        self.pycon_app_data_source = params.pycon_app_data_source
+        self.pycon_data_source = params.pycon_data_source
 
         uic.loadUiType("plugins/geo_maps/pycon_window_geo_map.ui", self)
         self.setWindowTitle("Geo Map")
@@ -83,9 +84,9 @@ class PyConWindowGeoMap(PyConPluginBase):
 
     def __load_signals(self):
         try:
-            self.time = self.pycon_app_data_source.get_channel(channel_name="timestamp")
-            self.lon_wgs84 = self.pycon_app_data_source.get_channel(channel_name="lon_wgs84")
-            self.lat_wgs84 = self.pycon_app_data_source.get_channel(channel_name="lat_wgs84")
+            self.time = self.pycon_data_source.get_channel(channel_name="timestamp")
+            self.lon_wgs84 = self.pycon_data_source.get_channel(channel_name="lon_wgs84")
+            self.lat_wgs84 = self.pycon_data_source.get_channel(channel_name="lat_wgs84")
 
             self.internal_status = True
 
@@ -110,12 +111,12 @@ class PyConWindowGeoMap(PyConPluginBase):
         except Exception as e:
             logger().warning(f"{str(e)}")
 
-    @QtCore.pyqtSlot(int, int)
-    def slider_value_changed(self, time_msec, time_diff_sec):
+    @QtCore.pyqtSlot(PyConTime)
+    def slider_value_changed(self, time: PyConTime):
         if self.internal_status == False:
             return
 
-        time_sec = time_msec / get_pycon_config().pycon_conversion_factor__time
+        time_sec = time.get_time_sec()
 
         idx, t = find_nearest_time(arr=self.time.samples, value=time_sec)
 
