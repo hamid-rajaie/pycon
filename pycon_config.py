@@ -70,6 +70,13 @@ class PyConConfig:
             },
         ]
 
+        self.pycon_plugins_top_view_cfg = [
+            {
+                "plugin_package": "plugins.top_view.plugins",
+                "plugin_dir": "C:\\develop\\pycon\\plugins\\top_view\\plugins",
+            },
+        ]
+
 
 g_pycon_config = None
 g_pycon_config_watchdog = None

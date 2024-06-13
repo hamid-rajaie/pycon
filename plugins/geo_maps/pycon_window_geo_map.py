@@ -97,7 +97,6 @@ class PyConWindowGeoMap(PyConPluginBase):
 
     def render_geo_map(self):
         try:
-            logger().info("render map ....")
             self.geo_map = folium.Map(location=[48.8366488, 9.0966474], zoom_start=13)
 
             p_click = PyConFoliumClick()
