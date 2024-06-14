@@ -5,7 +5,7 @@ sys.path.append("../../")
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QApplication
 
-from main_window.pycon_main_window import PyConMainWindow
+from container.pycon_main_window import PyConMainWindow
 
 # main
 if __name__ == "__main__":

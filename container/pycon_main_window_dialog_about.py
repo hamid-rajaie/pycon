@@ -6,7 +6,7 @@ class PyConAboutDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        # uic.loadUi("main_window/pycon_main_window_dialog_about.ui", self)
+        # uic.loadUi("container/pycon_main_window_dialog_about.ui", self)
 
         self.setWindowTitle("About PyCon Analyzer")
 

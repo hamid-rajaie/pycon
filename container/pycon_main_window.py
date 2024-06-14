@@ -18,9 +18,9 @@ from PyQt5.QtWidgets import (
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
 from common.pycon_std_plugins import PyConStdPlugins
+from container.pycon_main_window_dialog_about import PyConAboutDialog
 from data_sources.pycon_data_source_csv import PyConDataSourceCsv
 from data_sources.pycon_data_source_mdf import PyConDataSourceMdf
-from main_window.pycon_main_window_dialog_about import PyConAboutDialog
 from plugins_std.pycon_plugin_control_panel import PyConPluginControlPanel
 from plugins_std.pycon_plugin_signal_explorer import PyConPluginSignalExplorer
 from pycon_config import get_pycon_config
@@ -30,7 +30,7 @@ class PyConMainWindow(QMainWindow):
     def __init__(self):
         super(PyConMainWindow, self).__init__()
 
-        uic.loadUi("main_window/pycon_main_window.ui", self)
+        uic.loadUi("container/pycon_main_window.ui", self)
 
         self.open_dir = None
 
@@ -74,7 +74,9 @@ class PyConMainWindow(QMainWindow):
         self.settings.endGroup()
 
         tab = self.tab_widget.currentWidget()
-
+        # ==================================================================
+        # save settings : std plugins
+        # ==================================================================
         if tab is not None and tab.std_plugins is not None:
             std_plugins: PyConStdPlugins = tab.std_plugins
 
@@ -84,7 +86,9 @@ class PyConMainWindow(QMainWindow):
                     self.settings.setValue("visible", plugin.isVisible())
                     self.settings.setValue("geometry", plugin.geometry())
                     self.settings.endGroup()
-
+        # ==================================================================
+        # save settings : plugins
+        # ==================================================================
         if tab is not None and tab.plugins is not None:
             plugins = tab.plugins
             for plugin_menu_group, list_plugins in plugins.items():
@@ -239,14 +243,16 @@ class PyConMainWindow(QMainWindow):
             plugins = self.discover_plugins(params=plugin_params)
             tab.plugins = plugins
             # ==================================================================
-            # init plugins
+            # init std plugins
             # ==================================================================
             menu_grp = QMenu("&Standard", self)
             self.menu_plugins.addMenu(menu_grp)
             self.menu_groups["std"] = menu_grp
             for _, plugin in std_plugins.__dict__.items():
                 self.init_plugin(tab_mdi_area=tab_mdi_area, plugin=plugin, parent_menu=menu_grp)
-
+            # ==================================================================
+            # init plugins
+            # ==================================================================
             for plugin_menu_group, list_plugins in plugins.items():
                 menu_grp = QMenu(plugin_menu_group, self)
                 self.menu_plugins.addMenu(menu_grp)
