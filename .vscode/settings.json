@@ -122,6 +122,7 @@
         "lvscan",
         "makecache",
         "makemigrations",
+        "markersize",
         "maxdepth",
         "metalink",
         "morlet",

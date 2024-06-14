@@ -28,48 +28,18 @@ class PyConWindowTopView(PyConPluginBase):
 
         self.pycon_data_source = params.pycon_data_source
 
-        # self.internal_status = False
-
         self.plugins = None
 
         self.widget_1 = None
         self.widget_2 = None
 
-        self.mapping = {
-            # (signal_name, plot_lines, label)
-            "video_lines": [
-                ("left", 0, "ego"),
-                ("right", 1, "ego"),
-                ("leftLeft", 2, "neighbour"),
-                ("rightRight", 3, "neighbour"),
-                ("roadEdgeLeft", 4, "road_edges"),
-                ("roadEdgeRight", 5, "road_edges"),
-            ],
-            "gt_lines": [
-                ("EgoLeft", 6, "gt_ego"),
-                ("EgoRight", 7, "gt_ego"),
-                ("EgoMean", 8, "gt_ego_mean"),
-                ("RoadEdgeLeft", 9, "gt_road_edge"),
-                ("RoadEdgeRight", 10, "gt_road_edge"),
-            ],
-            "map_sensor": [("mapSensor.roadSegmentGeometryCollection", 11, "map_ref_line")],
-        }
-
-        self.plot_colors = {
-            "map_ref_line": "blue",
-            "ego": "green",
-            "neighbour": "#FDF207",
-            "road_edges": "magenta",
-            "gt_ego": "black",
-            "gt_ego_mean": "red",
-            "gt_road_edge": "black",
-        }
+        self.plot_lines = []
 
         self.__initUI()
 
-        # ==================================================================
+        # ======================================================================
         # create params
-        # ==================================================================
+        # ======================================================================
         top_view_params = PyConTopViewParams(pycon_data_source=self.pycon_data_source)
 
         self.plugins = self.discover_plugins(params=top_view_params)
@@ -126,7 +96,6 @@ class PyConWindowTopView(PyConPluginBase):
         return plugins
 
     def __load_signals(self):
-
         for plugin in self.plugins:
             plugin.load_signals()
 
@@ -139,8 +108,6 @@ class PyConWindowTopView(PyConPluginBase):
         # https://matplotlib.org/stable/api/axes_api.html
         fig, ax = plt.subplots()
         # fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
-
-        self.plot_lines = []
 
         for plugin in self.plugins:
             plugin.init(ax, self.plot_lines)
@@ -157,6 +124,6 @@ class PyConWindowTopView(PyConPluginBase):
         time_sec = time.get_time_sec()
 
         for plugin in self.plugins:
-            plugin.draw(time_sec, self.plot_lines)
+            plugin.render(time_sec, self.plot_lines)
 
         self.canvas.draw()

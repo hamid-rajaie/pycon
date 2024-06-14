@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.lines import Line2D
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMdiSubWindow
@@ -22,18 +23,28 @@ class PyConTopViewPluginBase:
     def init(self, ax: axes, plot_lines: list):
         raise Exception("init is not implemented")
 
-    def draw(self, time_sec, plot_lines: list):
-        raise Exception("draw is not implemented")
+    def render(self, time_sec, plot_lines: list):
+        raise Exception("render is not implemented")
 
-    def plot_data(self, ax, x, y, marker, color, linewidth, markersize, label):
+    def plot_data(self, ax: axes, x_array, y_array, marker, color, linewidth, markersize, label):
+        # https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes
+        #
+        # https://matplotlib.org/stable/api/axes_api.html
+        #
         # https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html#matplotlib.axes.Axes.plot
         # return : list of Line2D : https://matplotlib.org/stable/api/_as_gen/matplotlib.lines.Line2D.html#matplotlib.lines.Line2D
-        return ax.plot(
-            x,
-            y,
+
+        line_2d_list: list[Line2D] = ax.plot(
+            x_array,
+            y_array,
             marker=marker,
             color=color,
             linewidth=linewidth,
             markersize=markersize,
             label=label,
         )
+
+        logger().info(f"type of line_2d_list : {type(line_2d_list)}, len : {len(line_2d_list)}")
+        logger().info(f"type of line_2d_list : {type(line_2d_list[0])}")
+
+        return line_2d_list
