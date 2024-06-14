@@ -119,7 +119,7 @@ class PyConTopViewClothoid(PyConTopViewPluginBase):
         except Exception as ex:
             logger().warning(str(ex))
 
-    def init(self, ax: axes, plot_lines: list):
+    def init(self, ax: axes, lines_2d: list):
         # https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes
         #
         # https://matplotlib.org/stable/api/axes_api.html
@@ -130,16 +130,16 @@ class PyConTopViewClothoid(PyConTopViewPluginBase):
                 ax=ax,
                 x_array=line.line_x_array,
                 y_array=line.line_y_array,
-                marker="o",
+                # marker="o",
                 color=line.line_color,
                 linewidth=0.5,
                 markersize=2,
                 label="left",
             )
 
-            plot_lines.append(line_2d_list[0])
+            lines_2d.append(line_2d_list[0])
 
-    def render(self, time_sec, plot_lines: list):
+    def render(self, time_sec, lines_2d: list):
 
         idx, t = find_nearest_time(arr=self.time.samples, value=time_sec)
 
@@ -154,9 +154,9 @@ class PyConTopViewClothoid(PyConTopViewPluginBase):
                 lookAheadDistance=line.line_clothoid.lookAheadDistance.samples[idx],
             )
 
-            plot_lines[line.line_index].set_xdata(x_array)
-            plot_lines[line.line_index].set_ydata(y_array)
-            plot_lines[line.line_index].set_color(line.line_color)
+            lines_2d[line.line_index].set_xdata(x_array)
+            lines_2d[line.line_index].set_ydata(y_array)
+            lines_2d[line.line_index].set_color(line.line_color)
 
     def provide_clothoid_values(
         self,

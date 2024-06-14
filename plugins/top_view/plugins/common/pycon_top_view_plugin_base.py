@@ -20,13 +20,13 @@ class PyConTopViewPluginBase:
     def load_signals(self):
         raise Exception("load_signals is not implemented")
 
-    def init(self, ax: axes, plot_lines: list):
+    def init(self, ax: axes, lines_2d: list):
         raise Exception("init is not implemented")
 
-    def render(self, time_sec, plot_lines: list):
+    def render(self, time_sec, lines_2d: list):
         raise Exception("render is not implemented")
 
-    def plot_data(self, ax: axes, x_array, y_array, marker, color, linewidth, markersize, label):
+    def plot_data(self, ax: axes, x_array, y_array, color, linewidth, markersize, label, marker=None):
         # https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes
         #
         # https://matplotlib.org/stable/api/axes_api.html

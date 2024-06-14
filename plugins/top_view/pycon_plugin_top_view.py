@@ -33,7 +33,7 @@ class PyConWindowTopView(PyConPluginBase):
         self.widget_1 = None
         self.widget_2 = None
 
-        self.plot_lines = []
+        self.lines_2d = []
 
         self.__initUI()
 
@@ -110,7 +110,7 @@ class PyConWindowTopView(PyConPluginBase):
         # fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
 
         for plugin in self.plugins:
-            plugin.init(ax, self.plot_lines)
+            plugin.init(ax, self.lines_2d)
 
         self.canvas = FigureCanvas(fig)
         self.nav_toolbar = NavigationToolbar(self.canvas, self)
@@ -124,6 +124,6 @@ class PyConWindowTopView(PyConPluginBase):
         time_sec = time.get_time_sec()
 
         for plugin in self.plugins:
-            plugin.render(time_sec, self.plot_lines)
+            plugin.render(time_sec, self.lines_2d)
 
         self.canvas.draw()
