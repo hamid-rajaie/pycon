@@ -1,0 +1,6 @@
+asammdf
+pyqtgraph
+PySide6
+natsort
+pyqtlet2
+packaging
