@@ -261,7 +261,7 @@ class PyConPluginSignalExplorer(PyConPluginBase):
     def add_signals_to_tree_view(self):
         self.signal_tree_view.model().removeRows(0, self.signal_tree_view.model().rowCount())
 
-        for group_index, group in enumerate(self.pycon_data_source.pycon_app_data.groups):
+        for group_index, group in enumerate(self.pycon_data_source.data.groups):
             channel_group = group.channel_group
             channel_group_comment = channel_group.comment
 

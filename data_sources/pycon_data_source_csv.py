@@ -32,13 +32,13 @@ class PyConDataSourceCsv(PyConDataSource):
 
             group.channels.append(channel)
 
-        self.pycon_app_data = PyConDataSourceGroups()
-        self.pycon_app_data.groups.append(group)
+        self.data = PyConDataSourceGroups()
+        self.data.groups.append(group)
 
     def get_groups(self):
-        return self.pycon_app_data.groups
+        return self.data.groups
 
     def get_channel(self, channel_name: str, group_index: int = None, channel_index: int = None):
-        return self.pycon_app_data.get_the_channel(
+        return self.data.get_the_channel(
             channel_name=channel_name, group_index=group_index, channel_index=channel_index
         )
