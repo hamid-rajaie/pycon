@@ -275,9 +275,7 @@ class PyConPluginSignalExplorer(PyConPluginBase):
                             channel_group_index=-1,
                             channel_group_comment=channel_group_comment,
                             channel_index=-1,
-                            text=f"Group Index: [{group_index}]  "
-                            f"comment :[{channel_group_comment}]  "
-                            f"contains ( {len(group.channels)} ) channels",
+                            text=f"Channel Group {group_index} " f"({channel_group_comment}) ",
                             font_size=12,
                             set_bold=False,
                         )

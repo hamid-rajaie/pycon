@@ -1,6 +1,5 @@
 import pandas as pd
 
-from common.logging.logger import logger
 from data_sources.pycon_data_source import PyConDataSource
 from data_sources.pycon_data_source_interface import (
     PyConDataSourceChannel,
@@ -9,7 +8,6 @@ from data_sources.pycon_data_source_interface import (
     PyConDataSourceGroup,
     PyConDataSourceGroups,
 )
-from data_sources.pycon_standard_item import PyConStandardItem
 
 
 class PyConDataSourceCsv(PyConDataSource):

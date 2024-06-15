@@ -4,7 +4,6 @@ from asammdf import MDF
 
 from common.logging.logger import logger
 from data_sources.pycon_data_source import PyConDataSource
-from data_sources.pycon_standard_item import PyConStandardItem
 
 
 class PyConDataSourceMdf(PyConDataSource):
