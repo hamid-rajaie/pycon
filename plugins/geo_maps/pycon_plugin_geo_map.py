@@ -54,7 +54,6 @@ class PyConPluginGeoMap(PyConPluginBase):
         self.lat_wgs84 = None
 
         self.geo_map = None
-        self.internal_status = False
 
         self.__initUI()
         self.__load_signals()
@@ -86,8 +85,6 @@ class PyConPluginGeoMap(PyConPluginBase):
             self.lon_wgs84 = self.pycon_data_source.get_channel(channel_name="lon_wgs84")
             self.lat_wgs84 = self.pycon_data_source.get_channel(channel_name="lat_wgs84")
 
-            self.internal_status = True
-
             self.render_geo_map()
 
             self.signal_time_loaded.emit(self.time.samples[0], self.time.samples[-1])
@@ -111,7 +108,7 @@ class PyConPluginGeoMap(PyConPluginBase):
 
     @QtCore.pyqtSlot(PyConTime)
     def slider_value_changed(self, time: PyConTime):
-        if self.internal_status == False:
+        if self.is_status_not_ok():
             return
 
         time_sec = time.get_time_sec()

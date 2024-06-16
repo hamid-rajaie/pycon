@@ -1,3 +1,5 @@
+from enum import Enum
+
 import numpy as np
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
@@ -8,8 +10,31 @@ from plugins_std.pycon_time import PyConTime
 
 
 class PyConPluginBase(QMdiSubWindow):
+
+    class PyConLineInternalStatus(Enum):
+        OK = "ok"
+        NOT_OK = "not_ok"
+
     def __init__(self):
         super().__init__()
+
+        self.status: PyConPluginBase.PyConLineInternalStatus = PyConPluginBase.PyConLineInternalStatus.NOT_OK
+
+    def set_status_ok(self):
+        self.status: PyConPluginBase.PyConLineInternalStatus = PyConPluginBase.PyConLineInternalStatus.OK
+
+    def set_status_not_ok(self):
+        self.status: PyConPluginBase.PyConLineInternalStatus = PyConPluginBase.PyConLineInternalStatus.NOT_OK
+
+    def is_status_ok(self):
+        if self.status == PyConPluginBase.PyConLineInternalStatus.OK:
+            return True
+        return False
+
+    def is_status_not_ok(self):
+        if self.status == PyConPluginBase.PyConLineInternalStatus.NOT_OK:
+            return True
+        return False
 
     def eventFilter(self, obj, event):
         if obj == self.widget() and event.type() == event.Close and obj.close():

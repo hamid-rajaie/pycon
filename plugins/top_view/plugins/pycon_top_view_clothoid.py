@@ -116,6 +116,8 @@ class PyConTopViewClothoid(PyConTopViewPluginBase):
                 line_clothoid.startPositionX = self.pycon_data_source.get_channel(channel_name=startPositionX)
                 line_clothoid.lookAheadDistance = self.pycon_data_source.get_channel(channel_name=lookAheadDistance)
 
+            self.set_status_ok()
+
         except Exception as ex:
             logger().warning(str(ex))
 
@@ -140,6 +142,9 @@ class PyConTopViewClothoid(PyConTopViewPluginBase):
             lines_2d.append(line_2d_list[0])
 
     def render(self, time_sec, lines_2d: list):
+
+        if self.is_status_not_ok():
+            return
 
         idx, t = find_nearest_time(arr=self.time.samples, value=time_sec)
 

@@ -1,3 +1,5 @@
+from enum import Enum
+
 import matplotlib.axes as axes
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,10 +14,36 @@ from common.logging.logger import logger
 
 
 class PyConTopViewPluginBase:
+
+    class PyConLineInternalStatus(Enum):
+        OK = "ok"
+        NOT_OK = "not_ok"
+
     def __init__(self, name: str):
         super().__init__()
 
         self.name = name
+        self.status: PyConTopViewPluginBase.PyConLineInternalStatus = (
+            PyConTopViewPluginBase.PyConLineInternalStatus.NOT_OK
+        )
+
+    def set_status_ok(self):
+        self.status: PyConTopViewPluginBase.PyConLineInternalStatus = PyConTopViewPluginBase.PyConLineInternalStatus.OK
+
+    def set_status_not_ok(self):
+        self.status: PyConTopViewPluginBase.PyConLineInternalStatus = (
+            PyConTopViewPluginBase.PyConLineInternalStatus.NOT_OK
+        )
+
+    def is_status_ok(self):
+        if self.status == PyConTopViewPluginBase.PyConLineInternalStatus.OK:
+            return True
+        return False
+
+    def is_status_not_ok(self):
+        if self.status == PyConTopViewPluginBase.PyConLineInternalStatus.NOT_OK:
+            return True
+        return False
 
     def load_signals(self):
         raise Exception("load_signals is not implemented")
@@ -44,7 +72,7 @@ class PyConTopViewPluginBase:
             label=label,
         )
 
-        logger().info(f"type of line_2d_list : {type(line_2d_list)}, len : {len(line_2d_list)}")
-        logger().info(f"type of line_2d_list : {type(line_2d_list[0])}")
+        # logger().info(f"type of line_2d_list : {type(line_2d_list)}, len : {len(line_2d_list)}")
+        # logger().info(f"type of line_2d_list : {type(line_2d_list[0])}")
 
         return line_2d_list
