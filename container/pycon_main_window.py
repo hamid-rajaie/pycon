@@ -227,6 +227,7 @@ class PyConMainWindow(QMainWindow):
                 selected_file_name=selected_file_name,
                 pycon_data_source=pycon_data_source,
             )
+
             # ==================================================================
             # create std_plugins
             # ==================================================================

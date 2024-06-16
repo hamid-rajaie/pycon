@@ -60,18 +60,9 @@ class PyConPluginSignalExplorer(PyConPluginBase):
         self.table_widget.setRowCount(initial_row_count)
         self.table_widget.setColumnCount(initial_col_count)
 
-        self.table_widget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.table_widget.customContextMenuRequested.connect(self.open_table_widget_rows_context_menu)
-
         header = self.table_widget.horizontalHeader()
-        header.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        header.customContextMenuRequested.connect(self.open_table_widget_header_context_menu)
 
         self.table_widget.setHorizontalHeaderLabels(["Key", "Value"])
-
-        # for idx in range(self.table_widget.rowCount()):
-        #    self.table_widget.setRowHeight(idx, row_height)
-        #    self.table_widget.setItemDelegateForRow(idx, self.delegate)
 
         self.table_widget.setItem(0, 0, QTableWidgetItem("File Name"))
         self.table_widget.setItem(0, 1, QTableWidgetItem("a full path here"))
@@ -87,9 +78,6 @@ class PyConPluginSignalExplorer(PyConPluginBase):
         self.signal_tree_view = QTreeView()
         self.signal_tree_view.setHeaderHidden(True)
         self.signal_tree_view.doubleClicked.connect(self.slot_signal_tree_view_double_clicked)
-
-        self.signal_tree_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.signal_tree_view.customContextMenuRequested.connect(self.open_signal_tree_view_context_menu)
 
         self.signal_tree_model = QStandardItemModel()
         self.signal_tree_model.setHorizontalHeaderLabels([self.tr("Signal Name")])
@@ -135,69 +123,6 @@ class PyConPluginSignalExplorer(PyConPluginBase):
             self.timer.start(self.search_time_out)
             self.timer_started = True
         return
-
-    # ==========================================================================
-    # context menu
-    # ==========================================================================
-    def open_table_widget_header_context_menu(self, pos):
-        """
-        open a context menu for the header ( not the rows )
-
-        :param pos: PyQt5.QtCore.QPoint object
-        """
-        logger().info("")
-
-    # ==========================================================================
-    # context menu
-    # ==========================================================================
-    def open_table_widget_rows_context_menu(self, pos):
-        """
-        open a context menu for the table ( rows but not the header )
-
-        :param pos: PyQt5.QtCore.QPoint object
-        """
-
-        model_index = self.table_widget.indexAt(pos)
-        if not model_index.isValid():
-            logger().info("model_index is not valid")
-            return
-        else:
-            logger().info("modelIndex is valid")
-        #
-        # open context menu
-        #
-        menu = QMenu(self)
-        view_all_signals_action = menu.addAction("Table View")
-        action = menu.exec_(self.table_widget.mapToGlobal(pos))
-        if action == view_all_signals_action:
-            logger().info("")
-
-    # ==========================================================================
-    # context menu
-    # ==========================================================================
-    def open_signal_tree_view_context_menu(self, pos):
-        """
-        open a context menu for the tree view
-
-        :param pos: PyQt5.QtCore.QPoint object
-        """
-
-        logger().info("")
-        #
-        # todo, you can delete the following
-        #
-        # indexes = self.signal_tree_view.selectedIndexes()
-        index = self.signal_tree_view.selectedIndexes()[0]
-        item = index.model().itemFromIndex(index)
-        channel_name = item.text()
-        #
-        # open context menu
-        #
-        menu = QMenu(self)
-        action_1 = menu.addAction("Action 1")
-        action = menu.exec_(self.signal_tree_view.viewport().mapToGlobal(pos))
-        if action == action_1:
-            logger().info(f"channel_name : {channel_name}")
 
     # ==========================================================================
     # double click
