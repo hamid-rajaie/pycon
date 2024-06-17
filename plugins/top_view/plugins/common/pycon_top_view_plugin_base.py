@@ -27,6 +27,9 @@ class PyConTopViewPluginBase:
             PyConTopViewPluginBase.PyConLineInternalStatus.NOT_OK
         )
 
+    def init_data(self):
+        pass
+
     def set_status_ok(self):
         self.status: PyConTopViewPluginBase.PyConLineInternalStatus = PyConTopViewPluginBase.PyConLineInternalStatus.OK
 
@@ -44,9 +47,6 @@ class PyConTopViewPluginBase:
         if self.status == PyConTopViewPluginBase.PyConLineInternalStatus.NOT_OK:
             return True
         return False
-
-    def load_signals(self):
-        raise Exception("load_signals is not implemented")
 
     def init(self, ax: axes, lines_2d: list):
         raise Exception("init is not implemented")

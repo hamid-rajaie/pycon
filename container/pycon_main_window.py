@@ -1,7 +1,6 @@
 import importlib
 import os
 
-from PyQt5 import QtGui, uic
 from PyQt5.QtCore import QRect, QSettings
 from PyQt5.QtWidgets import (
     QAction,
@@ -29,8 +28,6 @@ from pycon_config import get_pycon_config
 class PyConMainWindow(QMainWindow):
     def __init__(self):
         super(PyConMainWindow, self).__init__()
-
-        uic.loadUi("container/pycon_main_window.ui", self)
 
         self.open_dir = None
 
@@ -157,7 +154,7 @@ class PyConMainWindow(QMainWindow):
 
         return plugins
 
-    def __init_plugin(self, tab_mdi_area, plugin, parent_menu):
+    def __setup_plugin_geometry(self, tab_mdi_area, plugin, parent_menu):
         if isinstance(plugin, QMdiSubWindow):
             self.settings.beginGroup(plugin.windowTitle())
             visible: bool = self.settings.value("visible", False, type=bool)
@@ -251,7 +248,8 @@ class PyConMainWindow(QMainWindow):
             self.menu_plugins.addMenu(menu_grp)
             self.menu_groups["std"] = menu_grp
             for _, plugin in std_plugins.__dict__.items():
-                self.__init_plugin(tab_mdi_area=tab_mdi_area, plugin=plugin, parent_menu=menu_grp)
+                self.__setup_plugin_geometry(tab_mdi_area=tab_mdi_area, plugin=plugin, parent_menu=menu_grp)
+
             # ==================================================================
             # init plugins
             # ==================================================================
@@ -261,7 +259,21 @@ class PyConMainWindow(QMainWindow):
                 self.menu_groups[plugin_menu_group] = menu_grp
 
                 for plugin in list_plugins:
-                    self.__init_plugin(tab_mdi_area=tab_mdi_area, plugin=plugin, parent_menu=menu_grp)
+                    self.__setup_plugin_geometry(tab_mdi_area=tab_mdi_area, plugin=plugin, parent_menu=menu_grp)
+
+            # ==================================================================
+            # init data std plugins
+            # ==================================================================
+            if True:
+                for _, plugin in std_plugins.__dict__.items():
+                    plugin.init_data()
+                # ==================================================================
+                # init data plugins
+                # ==================================================================
+                for plugin_menu_group, list_plugins in plugins.items():
+                    for plugin in list_plugins:
+                        plugin.init_data()
+
             # ==================================================
             # connect plugin_signal_explorer to plugin_control_panel
             # ==================================================

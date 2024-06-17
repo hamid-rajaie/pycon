@@ -55,7 +55,6 @@ class PyConPluginGeoMap(PyConPluginBase):
         self.geo_map = None
 
         self.__initUI()
-        self.__load_signals()
 
     def __initUI(self):
         self.geo_map_view = QWebEngineView()
@@ -78,7 +77,7 @@ class PyConPluginGeoMap(PyConPluginBase):
         """
         self.geo_map_view.load(url)
 
-    def __load_signals(self):
+    def init_data(self):
         try:
             self.time = self.pycon_data_source.get_channel(channel_name="timestamp")
             self.lon_wgs84 = self.pycon_data_source.get_channel(channel_name="lon_wgs84")

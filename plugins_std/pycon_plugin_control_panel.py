@@ -2,7 +2,7 @@ import sys
 import traceback
 
 import numpy as np
-from PyQt5 import QtCore, uic
+from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QHBoxLayout, QLineEdit, QSlider, QWidget
 
@@ -21,7 +21,6 @@ class PyConPluginControlPanel(PyConPluginBase):
     def __init__(self):
         super().__init__()
 
-        uic.loadUiType("plugins_std/pycon_plugin_control_panel.ui", self)
         self.setWindowTitle("Control Panel")
 
         self.int_min: int = 0

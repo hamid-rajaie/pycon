@@ -1,5 +1,5 @@
 import numpy as np
-from PyQt5 import QtCore, uic
+from PyQt5 import QtCore
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QStandardItemModel
 from PyQt5.QtWidgets import QHeaderView, QMenu, QTableWidget, QTableWidgetItem, QTreeView, QVBoxLayout, QWidget
@@ -22,7 +22,6 @@ class PyConPluginSignalExplorer(PyConPluginBase):
 
         self.pycon_data_source = pycon_data_source
 
-        uic.loadUiType("plugins_std/pycon_plugin_signal_explorer.ui", self)
         self.setWindowTitle("Signal Explorer")
         #
         # read csv

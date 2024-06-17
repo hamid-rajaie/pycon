@@ -46,7 +46,6 @@ class PyConWindowTopView(PyConPluginBase):
         for plugin in self.plugins:
             logger().info(f"found top view plugin : {plugin.name}")
 
-        self.__load_signals()
         self.__create_top_view()
 
     def __initUI(self):
@@ -94,9 +93,9 @@ class PyConWindowTopView(PyConPluginBase):
 
         return plugins
 
-    def __load_signals(self):
+    def init_data(self):
         for plugin in self.plugins:
-            plugin.load_signals()
+            plugin.init_data()
 
     def __create_top_view(self):
         # https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html

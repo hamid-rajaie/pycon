@@ -181,8 +181,6 @@ class PyConWindowPlugin_2(PyConPluginBase):
 
         :param pos: PyQt5.QtCore.QPoint object
         """
-
-        logger().info("")
         #
         # todo, you can delete the following
         #
@@ -208,7 +206,7 @@ class PyConWindowPlugin_2(PyConPluginBase):
         """
         if not modelIndex.parent().isValid():
             # root node is selected
-            logger().warning("you have double clicked on a channel")
+            logger().warning("you have double clicked on a parent")
             return
 
         channel_name = modelIndex.data()
@@ -219,41 +217,7 @@ class PyConWindowPlugin_2(PyConPluginBase):
         parentStandardItem = modelIndex.parent().model().itemFromIndex(modelIndex.parent())
         channel_group_comment = parentStandardItem.text()
 
-        channel_index_timestamp = 0
-        time_signals = ["time", "t", "timestamp"]
-
-        time = None
-
-        for sig_time in time_signals:
-            try:
-                time = self.pycon_data_source.get_channel(
-                    channel_name=sig_time, group_index=channel_group_index, channel_index=channel_index_timestamp
-                )
-                logger().info(f"{sig_time} found")
-            except Exception:
-                logger().warning(f"{sig_time} not found")
-
-        if time is None:
-            logger().warning("no time signal found")
-            return
-
-        try:
-            signal = self.pycon_data_source.get_channel(
-                channel_name=channel_name, group_index=channel_group_index, channel_index=channel_index
-            )
-            #
-            # type(signal.samples) is <class 'numpy.ndarray'>
-            #
-            self.signal_explorer_double_click.emit(
-                channel_group_index,
-                channel_index,
-                channel_name,
-                time.samples,
-                signal.samples,
-            )
-
-        except Exception as ex:
-            logger().warning(str(ex))
+        logger().info(f"channel name : {channel_name}")
 
     # ==========================================================================
     # add signals
@@ -261,40 +225,28 @@ class PyConWindowPlugin_2(PyConPluginBase):
     def add_signals_to_tree_view(self):
         self.signal_tree_view.model().removeRows(0, self.signal_tree_view.model().rowCount())
 
-        for group_index, group in enumerate(self.pycon_data_source.data.groups):
-            channel_group = group.channel_group
-            channel_group_comment = channel_group.comment
+        for parent in ["parent_1", "parent_2"]:
+            std_item_parent = PyConStandardItem(
+                channel_group_index=-1,
+                channel_group_comment=None,
+                channel_index=-1,
+                text=parent,
+                font_size=12,
+                set_bold=False,
+            )
+            self.root_node.appendRow(std_item_parent)
+            signals = []
+            for signal in ["sig 1", "sig 2"]:
+                std_item = PyConStandardItem(
+                    channel_group_index=-1,
+                    channel_group_comment=None,
+                    channel_index=-1,
+                    text=signal,
+                    font_size=12,
+                    set_bold=False,
+                )
+                signals.append(std_item)
+                std_item_parent.appendRows(signals)
 
-            std_item_channel_group = None
-
-            channels = []
-            for channel_index, channel in enumerate(group.channels):
-                if self.search_text in channel.name:
-                    if std_item_channel_group is None:
-                        std_item_channel_group = PyConStandardItem(
-                            channel_group_index=-1,
-                            channel_group_comment=channel_group_comment,
-                            channel_index=-1,
-                            text=f"Channel Group {group_index} " f"({channel_group_comment}) ",
-                            font_size=12,
-                            set_bold=False,
-                        )
-
-                    std_item_ch = PyConStandardItem(
-                        channel_group_index=group_index,
-                        channel_group_comment=channel_group_comment,
-                        channel_index=channel_index,
-                        text=f"{channel.name}",
-                        font_size=12,
-                        set_bold=False,
-                    )
-                    channels.append(std_item_ch)
-
-            if std_item_channel_group is not None:
-                std_item_channel_group.appendRows(channels)
-
-                self.root_node.appendRow(std_item_channel_group)
-
-        # self.signal_tree_view.setModel(self.signal_tree_model)
         if self.search_text != "":
             self.signal_tree_view.expandAll()
