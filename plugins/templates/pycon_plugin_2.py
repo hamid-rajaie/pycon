@@ -297,5 +297,4 @@ class PyConWindowPlugin_2(PyConPluginBase):
 
         # self.signal_tree_view.setModel(self.signal_tree_model)
         if self.search_text != "":
-            pass
             self.signal_tree_view.expandAll()

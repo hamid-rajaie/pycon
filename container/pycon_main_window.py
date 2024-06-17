@@ -157,7 +157,7 @@ class PyConMainWindow(QMainWindow):
 
         return plugins
 
-    def init_plugin(self, tab_mdi_area, plugin, parent_menu):
+    def __init_plugin(self, tab_mdi_area, plugin, parent_menu):
         if isinstance(plugin, QMdiSubWindow):
             self.settings.beginGroup(plugin.windowTitle())
             visible: bool = self.settings.value("visible", False, type=bool)
@@ -251,7 +251,7 @@ class PyConMainWindow(QMainWindow):
             self.menu_plugins.addMenu(menu_grp)
             self.menu_groups["std"] = menu_grp
             for _, plugin in std_plugins.__dict__.items():
-                self.init_plugin(tab_mdi_area=tab_mdi_area, plugin=plugin, parent_menu=menu_grp)
+                self.__init_plugin(tab_mdi_area=tab_mdi_area, plugin=plugin, parent_menu=menu_grp)
             # ==================================================================
             # init plugins
             # ==================================================================
@@ -261,7 +261,7 @@ class PyConMainWindow(QMainWindow):
                 self.menu_groups[plugin_menu_group] = menu_grp
 
                 for plugin in list_plugins:
-                    self.init_plugin(tab_mdi_area=tab_mdi_area, plugin=plugin, parent_menu=menu_grp)
+                    self.__init_plugin(tab_mdi_area=tab_mdi_area, plugin=plugin, parent_menu=menu_grp)
             # ==================================================
             # connect plugin_signal_explorer to plugin_control_panel
             # ==================================================

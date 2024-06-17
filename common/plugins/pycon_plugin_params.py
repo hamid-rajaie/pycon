@@ -13,6 +13,8 @@ class PyConPluginParams:
 
         self.settings: QSettings = settings
 
+        self.alias_signal_dict = {}
+
         self.video_name = os.path.join(
             os.path.dirname(selected_file_name),
             os.path.splitext(os.path.basename(selected_file_name))[0] + ".mp4",

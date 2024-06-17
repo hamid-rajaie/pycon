@@ -37,6 +37,9 @@ class PyConWindowPlugin_2(PyConPluginBase):
 
         self.pycon_data_source = params.pycon_data_source
         self.settings = params.settings
+        self.alias_signal_dict = params.alias_signal_dict
+        self.missing_needed_signals = []
+        self.missing_optional_signals = []
 
         self.setWindowTitle("Plugin yaml")
         #
@@ -158,25 +161,87 @@ class PyConWindowPlugin_2(PyConPluginBase):
             with open(selected_file_name, "r") as file:
                 yaml_data_dict = yaml.safe_load(file)
 
-                alias_signal_dict, missing_needed_signals, missing_optional_signals = self.choose_yaml_signals(
-                    yaml_data_dict=yaml_data_dict
+                self.parse_yaml(yaml_data_dict=yaml_data_dict)
+                self.add_alias_signals()
+
+    def add_alias_signals(self):
+
+        self.signal_tree_view.model().removeRows(0, self.signal_tree_view.model().rowCount())
+
+        std_item_found_signals = PyConStandardItem(
+            channel_group_index=-1,
+            channel_group_comment=None,
+            channel_index=-1,
+            text="found signals",
+            font_size=12,
+            set_bold=False,
+        )
+        self.root_node.appendRow(std_item_found_signals)
+
+        for alias, signal in self.alias_signal_dict.items():
+
+            if self.search_text in alias:
+
+                std_item_parent = PyConStandardItem(
+                    channel_group_index=-1,
+                    channel_group_comment=None,
+                    channel_index=-1,
+                    text=f"{alias}",
+                    font_size=12,
+                    set_bold=False,
+                )
+                channels = []
+                std_item_signal = PyConStandardItem(
+                    channel_group_index=-1,
+                    channel_group_comment=None,
+                    channel_index=-1,
+                    text=f"{signal}",
+                    font_size=12,
+                    set_bold=False,
+                )
+                channels.append(std_item_signal)
+                std_item_parent.appendRows(channels)
+                std_item_found_signals.appendRow(std_item_parent)
+
+        self.add_section(sig_list=self.missing_needed_signals)
+        self.add_section(sig_list=self.missing_optional_signals)
+
+        if self.search_text != "":
+            self.signal_tree_view.expandAll()
+
+    def add_section(self, sig_list):
+
+        std_item_parent = PyConStandardItem(
+            channel_group_index=-1,
+            channel_group_comment=None,
+            channel_index=-1,
+            text="missing needed signals",
+            font_size=12,
+            set_bold=False,
+        )
+        self.root_node.appendRow(std_item_parent)
+
+        for signal in sig_list:
+
+            if self.search_text in signal:
+
+                std_item = PyConStandardItem(
+                    channel_group_index=-1,
+                    channel_group_comment=None,
+                    channel_index=-1,
+                    text=f"{signal}",
+                    font_size=12,
+                    set_bold=False,
                 )
 
-                if False:
-                    for alias, signal in alias_signal_dict.items():
-                        logger().info(f"alias : {alias}  {signal}")
+                std_item_parent.appendRow(std_item)
 
-                    for signal in missing_needed_signals:
-                        logger().warning(f"missing needed : {signal}")
-                    for signal in missing_optional_signals:
-                        logger().info(f"missing optional : {signal}")
+    def parse_yaml(self, yaml_data_dict: dict) -> tuple:
 
-    def choose_yaml_signals(self, yaml_data_dict: dict) -> tuple:
+        self.missing_needed_signals = []
+        self.missing_optional_signals = []
 
-        missing_needed_signals = []
-        missing_optional_signals = []
-
-        alias_signal_dict = {}
+        self.alias_signal_dict = {}
 
         data_mf4 = self.pycon_data_source.data
         iter_mf4 = data_mf4.channels_db.keys()
@@ -198,7 +263,7 @@ class PyConWindowPlugin_2(PyConPluginBase):
                     for _, alias_signal in enumerate(alias_signals):
                         if alias_signal in iter_mf4:
                             if self.regex_indicator not in alias_signal:
-                                alias_signal_dict[alias] = alias_signal
+                                self.alias_signal_dict[alias] = alias_signal
                                 signal_available = True
                                 break
                         else:
@@ -253,18 +318,17 @@ class PyConWindowPlugin_2(PyConPluginBase):
                                                 + self.VIDEO_LINES_MAPPING.get(match[0], f"UNKOWN-{new_alias[11]}")
                                                 + new_alias[12:]
                                             )
-                                        alias_signal_dict[new_alias] = new_signal
+                                        self.alias_signal_dict[new_alias] = new_signal
                                         signal_available = True
 
                                 if signal_available:
                                     break
                 if not signal_available and alias_optional is not None:
-                    missing_optional_signals.append(alias)
+                    self.missing_optional_signals.append(alias)
                 if not signal_available and alias_optional is None:
-                    missing_needed_signals.append(alias)
+                    self.missing_needed_signals.append(alias)
             except Exception as exp:
                 logger().warning(f"alias: {alias}  {str(exp)}")
-        return (alias_signal_dict, missing_needed_signals, missing_optional_signals)
 
     # ==========================================================================
     # search
@@ -274,7 +338,7 @@ class PyConWindowPlugin_2(PyConPluginBase):
         self.timer.stop()
         self.timer_started = False
 
-        # self.add_signals_to_tree_view()
+        self.add_alias_signals()
 
     def slot_search(self, search_text):
         logger().info(f"{search_text} ... {self.search_cnt}")
