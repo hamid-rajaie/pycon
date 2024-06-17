@@ -4,7 +4,7 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from PyQt5 import QtCore, uic
+from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QVBoxLayout, QWidget
 
@@ -22,7 +22,6 @@ class PyConWindowTopView(PyConPluginBase):
     def __init__(self, params: PyConPluginParams):
         super().__init__()
 
-        uic.loadUiType("plugins/top_view/pycon_plugin_top_view.ui", self)
         self.setWindowTitle("Top View")
         self.resize(500, 700)
 

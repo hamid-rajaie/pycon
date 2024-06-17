@@ -2,7 +2,7 @@ import io
 
 import folium
 from jinja2 import Template
-from PyQt5 import QtCore, uic
+from PyQt5 import QtCore
 from PyQt5.QtCore import QObject, pyqtSlot
 from PyQt5.QtWebChannel import QWebChannel
 from PyQt5.QtWebEngineWidgets import QWebEngineView
@@ -38,7 +38,6 @@ class PyConPluginGeoMap(PyConPluginBase):
 
         self.pycon_data_source = params.pycon_data_source
 
-        uic.loadUiType("plugins/geo_maps/pycon_plugin_geo_map.ui", self)
         self.setWindowTitle("Geo Map")
 
         self.win_widget = None
@@ -84,7 +83,7 @@ class PyConPluginGeoMap(PyConPluginBase):
             self.time = self.pycon_data_source.get_channel(channel_name="timestamp")
             self.lon_wgs84 = self.pycon_data_source.get_channel(channel_name="lon_wgs84")
             self.lat_wgs84 = self.pycon_data_source.get_channel(channel_name="lat_wgs84")
-
+            self.set_status_ok()
             self.render_geo_map()
 
             self.signal_time_loaded.emit(self.time.samples[0], self.time.samples[-1])

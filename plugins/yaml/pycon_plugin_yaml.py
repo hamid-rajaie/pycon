@@ -23,7 +23,7 @@ class PyConWindowPlugin_2(PyConPluginBase):
 
         self.pycon_data_source = params.pycon_data_source
 
-        self.setWindowTitle("Plugin 2")
+        self.setWindowTitle("Plugin yaml")
         #
         # read csv
         #

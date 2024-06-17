@@ -3,7 +3,7 @@ from matplotlib import gridspec, rc, rcParams
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
-from PyQt5 import QtCore, uic
+from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QVBoxLayout, QWidget
 
@@ -19,7 +19,6 @@ class PyConWindowSignalPlot(PyConPluginBase):
     def __init__(self, params: PyConPluginParams):
         super().__init__()
 
-        uic.loadUiType("plugins/plots/pycon_plugin_signal_plot.ui", self)
         self.setWindowTitle("Signal Plot")
 
         self.widget_1 = None

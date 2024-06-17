@@ -1,5 +1,5 @@
 import numpy as np
-from PyQt5 import QtCore, uic
+from PyQt5 import QtCore
 from PyQt5.QtGui import QStandardItemModel
 from PyQt5.QtWidgets import QMenu, QTreeView, QVBoxLayout, QWidget
 
@@ -16,7 +16,6 @@ class PyConWindowSelectedSignals(PyConPluginBase):
     def __init__(self, params: PyConPluginParams):
         super().__init__()
 
-        uic.loadUiType("plugins/tables/pycon_plugin_selected_signals.ui", self)
         self.setWindowTitle("Selected Signals")
         #
         # read csv

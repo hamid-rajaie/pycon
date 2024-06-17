@@ -1,5 +1,5 @@
 import numpy as np
-from PyQt5 import QtCore, QtGui, uic
+from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTableView, QVBoxLayout, QWidget
 
@@ -77,8 +77,6 @@ class PyConWindowSignalTable(PyConPluginBase):
 
     def __init__(self, params: PyConPluginParams):
         super().__init__()
-
-        uic.loadUiType("plugins/tables/pycon_plugin_signal_table.ui", self)
 
         self.df = params.pycon_data_source
 

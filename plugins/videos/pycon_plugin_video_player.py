@@ -1,7 +1,7 @@
 import os
 
 import cv2
-from PyQt5 import QtCore, uic
+from PyQt5 import QtCore
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QLabel, QVBoxLayout, QWidget
 
@@ -16,7 +16,6 @@ class PyConWindowVideoPlayer(PyConPluginBase):
     def __init__(self, params: PyConPluginParams):
         super().__init__()
 
-        uic.loadUiType("plugins/videos/pycon_plugin_video_player.ui", self)
         self.setWindowTitle("Video Player")
 
         self.win_widget = None
@@ -66,7 +65,8 @@ class PyConWindowVideoPlayer(PyConPluginBase):
         return duration_sec
 
     def closeEvent(self, event):
-        self.cap.release()
+        if self.cap is not None:
+            self.cap.release()
         super().closeEvent(event)
 
     def __display_frame(self):

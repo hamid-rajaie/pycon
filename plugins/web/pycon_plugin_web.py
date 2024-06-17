@@ -1,4 +1,3 @@
-from PyQt5 import uic
 from PyQt5.QtCore import QEvent, QObject, QUrl, pyqtSlot
 from PyQt5.QtWebChannel import QWebChannel
 from PyQt5.QtWebEngineWidgets import QWebEngineView
@@ -20,7 +19,6 @@ class PyConWindowWeb(PyConPluginBase):
     def __init__(self, params: PyConPluginParams):
         super().__init__()
 
-        uic.loadUiType("plugins/web/pycon_plugin_web.ui", self)
         self.setWindowTitle("Web")
 
         self.win_widget = None
