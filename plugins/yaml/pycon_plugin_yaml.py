@@ -1,8 +1,21 @@
+import os
+import re
+
 import numpy as np
-from PyQt5 import QtCore
+import yaml
+from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QStandardItemModel
-from PyQt5.QtWidgets import QHeaderView, QMenu, QTableWidget, QTableWidgetItem, QTreeView, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import (
+    QFileDialog,
+    QHeaderView,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QTreeView,
+    QVBoxLayout,
+    QWidget,
+)
 
 from common.delegates.pycon_window_signal_explorer_delegate import PyConWindowSignalExplorerDelegate
 from common.logging.logger import logger
@@ -10,6 +23,7 @@ from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
 from data_sources.pycon_data_source import PyConDataSource
 from data_sources.pycon_standard_item import PyConStandardItem
+from pycon_config import get_pycon_config
 
 
 class PyConWindowPlugin_2(PyConPluginBase):
@@ -22,6 +36,7 @@ class PyConWindowPlugin_2(PyConPluginBase):
         super().__init__()
 
         self.pycon_data_source = params.pycon_data_source
+        self.settings = params.settings
 
         self.setWindowTitle("Plugin yaml")
         #
@@ -46,26 +61,32 @@ class PyConWindowPlugin_2(PyConPluginBase):
         self.delegate = PyConWindowSignalExplorerDelegate(self)
         self.delegate.newSearch.connect(self.slot_search)
 
-        self.init_window()
+        self.__initUI()
 
-        self.add_signals_to_tree_view()
+        self.regex_indicator = "%"
 
-    def init_window(self):
-        initial_row_count = 2
+        self.VIDEO_LINES_MAPPING = {
+            "0": "left",
+            "1": "right",
+            "2": "leftLeft",
+            "3": "rightRight",
+            "4": "roadEdgeLeft",
+            "5": "roadEdgeRight",
+            "6": "roadEdgeLeftRaised",
+            "7": "roadEdgeRightRaised",
+        }
+
+    def __initUI(self):
+        initial_row_count = 3
         initial_col_count = 2
-        #
+        # ======================================================================
         # table widget
-        #
+        # ======================================================================
         self.table_widget = QTableWidget()
         self.table_widget.setRowCount(initial_row_count)
         self.table_widget.setColumnCount(initial_col_count)
 
-        self.table_widget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.table_widget.customContextMenuRequested.connect(self.open_table_widget_rows_context_menu)
-
         header = self.table_widget.horizontalHeader()
-        header.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        header.customContextMenuRequested.connect(self.open_table_widget_header_context_menu)
 
         self.table_widget.setHorizontalHeaderLabels(["Key", "Value"])
 
@@ -79,6 +100,13 @@ class PyConWindowPlugin_2(PyConPluginBase):
         self.table_widget.setItem(1, 0, QTableWidgetItem("Search"))
         self.table_widget.setItemDelegateForRow(1, self.delegate)
 
+        open_btn = QPushButton("Open")
+        open_btn.setCheckable(True)
+        open_btn.clicked.connect(self.open_yaml_file)
+
+        self.table_widget.setCellWidget(2, 0, open_btn)
+        self.table_widget.setItem(2, 1, QTableWidgetItem("Open yaml file"))
+
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
         #
@@ -86,10 +114,6 @@ class PyConWindowPlugin_2(PyConPluginBase):
         #
         self.signal_tree_view = QTreeView()
         self.signal_tree_view.setHeaderHidden(True)
-        self.signal_tree_view.doubleClicked.connect(self.slot_signal_tree_view_double_clicked)
-
-        self.signal_tree_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.signal_tree_view.customContextMenuRequested.connect(self.open_signal_tree_view_context_menu)
 
         self.signal_tree_model = QStandardItemModel()
         self.signal_tree_model.setHorizontalHeaderLabels([self.tr("Signal Name")])
@@ -111,6 +135,137 @@ class PyConWindowPlugin_2(PyConPluginBase):
         _widget.setLayout(_layout)
         self.setWidget(_widget)
 
+    def open_yaml_file(self):
+
+        self.settings.beginGroup("config")
+        _dir: str = self.settings.value("open_dir", "")
+        self.settings.endGroup()
+
+        dlg = QFileDialog(directory=_dir)
+
+        dlg.setNameFilters(get_pycon_config().pycon_start_yaml_filter)
+        dlg.selectNameFilter(get_pycon_config().pycon_start_yaml_filter_selected)
+
+        if dlg.exec_():
+            filenames = dlg.selectedFiles()
+            selected_file_name = filenames[0]
+            file_basename = os.path.basename(selected_file_name)
+            self.open_dir = os.path.dirname(selected_file_name)
+            file_basename_no_ext, file_basename_ext = os.path.splitext(file_basename)
+
+            logger().info(selected_file_name)
+
+            with open(selected_file_name, "r") as file:
+                yaml_data_dict = yaml.safe_load(file)
+
+                alias_signal_dict, missing_needed_signals, missing_optional_signals = self.choose_yaml_signals(
+                    yaml_data_dict=yaml_data_dict
+                )
+
+                if False:
+                    for alias, signal in alias_signal_dict.items():
+                        logger().info(f"alias : {alias}  {signal}")
+
+                    for signal in missing_needed_signals:
+                        logger().warning(f"missing needed : {signal}")
+                    for signal in missing_optional_signals:
+                        logger().info(f"missing optional : {signal}")
+
+    def choose_yaml_signals(self, yaml_data_dict: dict) -> tuple:
+
+        missing_needed_signals = []
+        missing_optional_signals = []
+
+        alias_signal_dict = {}
+
+        data_mf4 = self.pycon_data_source.data
+        iter_mf4 = data_mf4.channels_db.keys()
+        signals_mf4 = [channel.name for group in data_mf4.groups for channel in group.channels]
+
+        for alias, alias_desc in yaml_data_dict.items():
+
+            try:
+                alias_signals = alias_desc["signal"]
+
+                alias_optional = None
+                if "optional" in alias_desc.keys():
+                    alias_optional = alias_desc["signal"]
+
+                signal_available = False
+
+                if isinstance(alias_signals, list):
+
+                    for _, alias_signal in enumerate(alias_signals):
+                        if alias_signal in iter_mf4:
+                            if self.regex_indicator not in alias_signal:
+                                alias_signal_dict[alias] = alias_signal
+                                signal_available = True
+                                break
+                        else:
+                            if self.regex_indicator in alias_signal:
+                                regex_indices_alias = [i for i, c in enumerate(alias) if c == self.regex_indicator]
+                                regex_indices_signal = [
+                                    i for i, c in enumerate(alias_signal) if c == self.regex_indicator
+                                ]
+                                regex_pattern = re.escape(
+                                    alias_signal[: regex_indices_signal[0]]
+                                )  # add the initial part of the string
+                                for i, index in enumerate(regex_indices_signal):
+                                    if i == 0:
+                                        continue  # skip the first occurrence since it was already added
+                                    prev_index = regex_indices_signal[i - 1]
+                                    regex_pattern += r"(?P<index{}_>\d+)".format(i)  # add the named capturing group
+                                    regex_pattern += re.escape(
+                                        alias_signal[prev_index + 1 : index]
+                                    )  # add the text between the % and the next occurrence
+                                regex_pattern += r"(?P<index{}_>\d+)".format(
+                                    len(regex_indices_signal)
+                                )  # add the final named capturing group
+                                regex_pattern += re.escape(
+                                    alias_signal[regex_indices_signal[-1] + 1 :]
+                                )  # add the final part of the string
+
+                                # find all matches
+                                matches = re.findall(regex_pattern, str(signals_mf4))
+                                if matches:
+                                    for match in matches:
+                                        if not isinstance(match, tuple):
+                                            match = [match]
+                                        new_alias = alias
+                                        new_signal = alias_signal
+                                        for pos, index in enumerate(match):
+                                            new_alias = (
+                                                new_alias[: regex_indices_alias[pos]]
+                                                + index
+                                                + new_alias[regex_indices_alias[pos] + 1 :]
+                                            )
+                                            new_signal = (
+                                                new_signal[: regex_indices_signal[pos]]
+                                                + index
+                                                + new_signal[regex_indices_signal[pos] + 1 :]
+                                            )
+                                        # for videoLines we need to map the alias name back!
+                                        if "videoLines" in new_alias and "polynomialLine" not in new_alias:
+                                            # index:    11 12
+                                            # videoLines.X.
+                                            new_alias = (
+                                                new_alias[:11]
+                                                + self.VIDEO_LINES_MAPPING.get(match[0], f"UNKOWN-{new_alias[11]}")
+                                                + new_alias[12:]
+                                            )
+                                        alias_signal_dict[new_alias] = new_signal
+                                        signal_available = True
+
+                                if signal_available:
+                                    break
+                if not signal_available and alias_optional is not None:
+                    missing_optional_signals.append(alias)
+                if not signal_available and alias_optional is None:
+                    missing_needed_signals.append(alias)
+            except Exception as exp:
+                logger().warning(f"alias: {alias}  {str(exp)}")
+        return (alias_signal_dict, missing_needed_signals, missing_optional_signals)
+
     # ==========================================================================
     # search
     # ==========================================================================
@@ -119,7 +274,7 @@ class PyConWindowPlugin_2(PyConPluginBase):
         self.timer.stop()
         self.timer_started = False
 
-        self.add_signals_to_tree_view()
+        # self.add_signals_to_tree_view()
 
     def slot_search(self, search_text):
         logger().info(f"{search_text} ... {self.search_cnt}")
@@ -135,167 +290,3 @@ class PyConWindowPlugin_2(PyConPluginBase):
             self.timer.start(self.search_time_out)
             self.timer_started = True
         return
-
-    # ==========================================================================
-    # context menu
-    # ==========================================================================
-    def open_table_widget_header_context_menu(self, pos):
-        """
-        open a context menu for the header ( not the rows )
-
-        :param pos: PyQt5.QtCore.QPoint object
-        """
-        logger().info("")
-
-    # ==========================================================================
-    # context menu
-    # ==========================================================================
-    def open_table_widget_rows_context_menu(self, pos):
-        """
-        open a context menu for the table ( rows but not the header )
-
-        :param pos: PyQt5.QtCore.QPoint object
-        """
-
-        model_index = self.table_widget.indexAt(pos)
-        if not model_index.isValid():
-            logger().info("model_index is not valid")
-            return
-        else:
-            logger().info("modelIndex is valid")
-        #
-        # open context menu
-        #
-        menu = QMenu(self)
-        view_all_signals_action = menu.addAction("Table View")
-        action = menu.exec_(self.table_widget.mapToGlobal(pos))
-        if action == view_all_signals_action:
-            logger().info("")
-
-    # ==========================================================================
-    # context menu
-    # ==========================================================================
-    def open_signal_tree_view_context_menu(self, pos):
-        """
-        open a context menu for the tree view
-
-        :param pos: PyQt5.QtCore.QPoint object
-        """
-
-        logger().info("")
-        #
-        # todo, you can delete the following
-        #
-        # indexes = self.signal_tree_view.selectedIndexes()
-        index = self.signal_tree_view.selectedIndexes()[0]
-        item = index.model().itemFromIndex(index)
-        channel_name = item.text()
-        #
-        # open context menu
-        #
-        menu = QMenu(self)
-        action_1 = menu.addAction("Action 1")
-        action = menu.exec_(self.signal_tree_view.viewport().mapToGlobal(pos))
-        if action == action_1:
-            logger().info(f"channel_name : {channel_name}")
-
-    # ==========================================================================
-    # double click
-    # ==========================================================================
-    def slot_signal_tree_view_double_clicked(self, modelIndex):
-        """
-        :param modelIndex: a PyQt5.QtCore.QModelIndex
-        """
-        if not modelIndex.parent().isValid():
-            # root node is selected
-            logger().warning("you have double clicked on a channel")
-            return
-
-        channel_name = modelIndex.data()
-        standardItem = modelIndex.model().itemFromIndex(modelIndex)
-        channel_group_index = standardItem.channel_group_index
-        channel_index = standardItem.channel_index
-
-        parentStandardItem = modelIndex.parent().model().itemFromIndex(modelIndex.parent())
-        channel_group_comment = parentStandardItem.text()
-
-        channel_index_timestamp = 0
-        time_signals = ["time", "t", "timestamp"]
-
-        time = None
-
-        for sig_time in time_signals:
-            try:
-                time = self.pycon_data_source.get_channel(
-                    channel_name=sig_time, group_index=channel_group_index, channel_index=channel_index_timestamp
-                )
-                logger().info(f"{sig_time} found")
-            except Exception:
-                logger().warning(f"{sig_time} not found")
-
-        if time is None:
-            logger().warning("no time signal found")
-            return
-
-        try:
-            signal = self.pycon_data_source.get_channel(
-                channel_name=channel_name, group_index=channel_group_index, channel_index=channel_index
-            )
-            #
-            # type(signal.samples) is <class 'numpy.ndarray'>
-            #
-            self.signal_explorer_double_click.emit(
-                channel_group_index,
-                channel_index,
-                channel_name,
-                time.samples,
-                signal.samples,
-            )
-
-        except Exception as ex:
-            logger().warning(str(ex))
-
-    # ==========================================================================
-    # add signals
-    # ==========================================================================
-    def add_signals_to_tree_view(self):
-        self.signal_tree_view.model().removeRows(0, self.signal_tree_view.model().rowCount())
-
-        for group_index, group in enumerate(self.pycon_data_source.data.groups):
-            channel_group = group.channel_group
-            channel_group_comment = channel_group.comment
-
-            std_item_channel_group = None
-
-            channels = []
-            for channel_index, channel in enumerate(group.channels):
-                if self.search_text in channel.name:
-                    if std_item_channel_group is None:
-                        std_item_channel_group = PyConStandardItem(
-                            channel_group_index=-1,
-                            channel_group_comment=channel_group_comment,
-                            channel_index=-1,
-                            text=f"Channel Group {group_index} " f"({channel_group_comment}) ",
-                            font_size=12,
-                            set_bold=False,
-                        )
-
-                    std_item_ch = PyConStandardItem(
-                        channel_group_index=group_index,
-                        channel_group_comment=channel_group_comment,
-                        channel_index=channel_index,
-                        text=f"{channel.name}",
-                        font_size=12,
-                        set_bold=False,
-                    )
-                    channels.append(std_item_ch)
-
-            if std_item_channel_group is not None:
-                std_item_channel_group.appendRows(channels)
-
-                self.root_node.appendRow(std_item_channel_group)
-
-        # self.signal_tree_view.setModel(self.signal_tree_model)
-        if self.search_text != "":
-            pass
-            self.signal_tree_view.expandAll()

@@ -29,9 +29,9 @@ class PyConWindowSelectedSignals(PyConPluginBase):
 
         self.selected_signals = {}
 
-        self.init_window()
+        self.__initUI()
 
-    def init_window(self):
+    def __initUI(self):
         #
         # create tree view/model
         #

@@ -46,11 +46,11 @@ class PyConWindowPlugin_2(PyConPluginBase):
         self.delegate = PyConWindowSignalExplorerDelegate(self)
         self.delegate.newSearch.connect(self.slot_search)
 
-        self.init_window()
+        self.__initUI()
 
         self.add_signals_to_tree_view()
 
-    def init_window(self):
+    def __initUI(self):
         initial_row_count = 2
         initial_col_count = 2
         #

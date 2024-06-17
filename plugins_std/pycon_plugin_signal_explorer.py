@@ -46,16 +46,16 @@ class PyConPluginSignalExplorer(PyConPluginBase):
         self.delegate = PyConWindowSignalExplorerDelegate(self)
         self.delegate.newSearch.connect(self.slot_search)
 
-        self.init_window()
+        self.__initUI()
 
         self.add_signals_to_tree_view()
 
-    def init_window(self):
+    def __initUI(self):
         initial_row_count = 2
         initial_col_count = 2
-        #
+        # ======================================================================
         # table widget
-        #
+        # ======================================================================
         self.table_widget = QTableWidget()
         self.table_widget.setRowCount(initial_row_count)
         self.table_widget.setColumnCount(initial_col_count)

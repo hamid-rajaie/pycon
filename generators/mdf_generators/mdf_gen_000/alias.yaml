@@ -1,0 +1,89 @@
+# aliasName:
+  # signal:
+  # - signal_name_in_mf4_od_7
+  # - signal_name_in_mf4_od_8
+  # norm: (optional)
+  # - norming_factor_od_7
+  # - norming_factor_od_8
+  # offset: (optional)
+  # - offset_od_7
+  # - offset_od_8
+  # optional: (optional) arbitrary string to indicate that signal is not necessarily needed
+  # f(x) = x * (1 / norm) + (offset)
+# hint: if there are multiple signals available inside the mf4, the FIRST occurred signal (top to buttom) will be choosen
+
+
+acc:
+  signal:
+  - runnable_0.acceleration
+  - runnable_1.acceleration
+  - runnable_2.acceleration
+  - runnable_3.acceleration
+  norm:
+  - 1
+  - 1
+  - 1
+  - 1
+  optional: acc
+
+vel_y:
+  signal:
+  - runnable_0.velocity
+  - runnable_1.velocity
+  - runnable_2.velocity
+  - runnable_3.velocity
+  norm:
+  - 1
+  - 1
+  - 1
+  - 1
+  optional: vcc
+
+
+dummy_0:
+  signal:
+  - runnable_0.dummy
+  - runnable_1.dummy
+  - runnable_2.dummy
+  - runnable_3.dummy
+  norm:
+  - 1
+  - 1
+  - 1
+  - 1
+
+dummy_1:
+  signal:
+  - runnable_0.dummy
+  - runnable_1.dummy
+  - runnable_2.dummy
+  - runnable_3.dummy
+  norm:
+  - 1
+  - 1
+  - 1
+  - 1
+  optional: dummy
+
+videoLines.%.clothoid.latDeviation:
+  signal:
+  - runnable_0.m_videoLines.videoLines.i%.dy
+  - runnable_0.m_videoLines.videoLines.i%.dy
+  - runnable_0.m_videoLines.videoLines.i%.dy
+  norm:
+  - 1
+  - 1
+  - 1
+  optional: video_clothoid
+
+videoLines.%.clothoid.curvature:
+  signal:
+  - runnable_0.m_videoLines.videoLines.i%.curv
+  - runnable_0.m_videoLines.videoLines.i%.curv
+  - runnable_0.m_videoLines.videoLines.i%.curv
+  norm:
+  - 1
+  - 1
+  - 1
+  optional: video_clothoid
+

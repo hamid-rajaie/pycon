@@ -1,12 +1,17 @@
 import os
 
+from PyQt5.QtCore import QSettings
+
 from data_sources.pycon_data_source import PyConDataSource
 
 
 class PyConPluginParams:
-    def __init__(self, selected_file_name: str, pycon_data_source: PyConDataSource) -> None:
+
+    def __init__(self, selected_file_name: str, pycon_data_source: PyConDataSource, settings: QSettings) -> None:
 
         self.pycon_data_source: PyConDataSource = pycon_data_source
+
+        self.settings: QSettings = settings
 
         self.video_name = os.path.join(
             os.path.dirname(selected_file_name),

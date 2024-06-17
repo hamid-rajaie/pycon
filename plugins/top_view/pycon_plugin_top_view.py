@@ -41,7 +41,7 @@ class PyConWindowTopView(PyConPluginBase):
         # ======================================================================
         top_view_params = PyConTopViewParams(pycon_data_source=self.pycon_data_source)
 
-        self.plugins = self.discover_plugins(params=top_view_params)
+        self.plugins = self.__discover_plugins(params=top_view_params)
 
         for plugin in self.plugins:
             logger().info(f"found top view plugin : {plugin.name}")
@@ -71,7 +71,7 @@ class PyConWindowTopView(PyConPluginBase):
         _widget.setLayout(_layout)
         self.setWidget(_widget)
 
-    def discover_plugins(self, params: PyConTopViewParams):
+    def __discover_plugins(self, params: PyConTopViewParams):
         plugins = []
 
         for plugin_cfg in get_pycon_config().pycon_plugins_top_view_cfg:

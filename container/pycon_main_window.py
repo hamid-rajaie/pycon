@@ -1,7 +1,7 @@
 import importlib
 import os
 
-from PyQt5 import uic
+from PyQt5 import QtGui, uic
 from PyQt5.QtCore import QRect, QSettings
 from PyQt5.QtWidgets import (
     QAction,
@@ -35,7 +35,9 @@ class PyConMainWindow(QMainWindow):
         self.open_dir = None
 
         self.menu_groups = {}
-
+        # ======================================================================
+        # app setting
+        # ======================================================================
         settings_file_path = "pycon_settings.ini"
         self.settings = QSettings(settings_file_path, QSettings.IniFormat)
         self.settings.setFallbacksEnabled(False)
@@ -59,7 +61,7 @@ class PyConMainWindow(QMainWindow):
         #
         # add menu
         #
-        self.create_menu_bar()
+        self.__create_menu_bar()
 
         self.show()
 
@@ -99,7 +101,7 @@ class PyConMainWindow(QMainWindow):
                         self.settings.setValue("geometry", plugin.geometry())
                         self.settings.endGroup()
 
-    def create_menu_bar(self):
+    def __create_menu_bar(self):
         action_open = QAction("Open...", self)
         action_exit = QAction("Exit", self)
         action_about = QAction("About", self)
@@ -128,7 +130,7 @@ class PyConMainWindow(QMainWindow):
         dialog = PyConAboutDialog()
         dialog.exec_()
 
-    def discover_plugins(self, params: PyConPluginParams):
+    def __discover_plugins(self, params: PyConPluginParams):
         plugins = {}
 
         for plugin_cfg in get_pycon_config().pycon_plugins_cfg:
@@ -224,8 +226,7 @@ class PyConMainWindow(QMainWindow):
             # create params
             # ==================================================================
             plugin_params = PyConPluginParams(
-                selected_file_name=selected_file_name,
-                pycon_data_source=pycon_data_source,
+                selected_file_name=selected_file_name, pycon_data_source=pycon_data_source, settings=self.settings
             )
 
             # ==================================================================
@@ -241,7 +242,7 @@ class PyConMainWindow(QMainWindow):
             # ==================================================================
             # detect plugins
             # ==================================================================
-            plugins = self.discover_plugins(params=plugin_params)
+            plugins = self.__discover_plugins(params=plugin_params)
             tab.plugins = plugins
             # ==================================================================
             # init std plugins

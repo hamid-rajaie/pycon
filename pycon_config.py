@@ -24,7 +24,10 @@ class PyConConfig:
         # ======================================================================
 
         self.pycon_start_dir_filter = ["CSV Files (*.csv)", "CanAPE (*.mf4)"]
-        self.pycon_start_dir_filter_selected = self.pycon_start_dir_filter[0]
+        self.pycon_start_dir_filter_selected = self.pycon_start_dir_filter[1]
+
+        self.pycon_start_yaml_filter = ["YAML Files (*.yaml)"]
+        self.pycon_start_yaml_filter_selected = self.pycon_start_yaml_filter[0]
 
         # convert sec to msec
         self.pycon_conversion_factor__time_sec_to_msec = 1000
