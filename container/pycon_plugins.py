@@ -43,9 +43,6 @@ class PyConPlugins:
         for plugin_menu_group, list_plugins in self.detected_plugins.items():
             for plugin in list_plugins:
                 if isinstance(plugin, PyConPluginBase):
-                    # def lambda_generator(plugin):
-                    #    return plugin.slot_add_signal_by_double_click
-
                     # ==================================================================
                     # connect : plugin_signal_explorer   signal_explorer_double_click
                     # to      : plugin                slot_add_signal_by_double_click
