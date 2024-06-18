@@ -70,6 +70,11 @@ class PyConWindowTopView(PyConPluginBase):
         _widget.setLayout(_layout)
         self.setWidget(_widget)
 
+    def get_settings(self):
+        for plugin in self.plugins:
+            self.settings[plugin.name] = {}
+        return self.settings
+
     def __discover_plugins(self, params: PyConTopViewParams):
         plugins = []
 

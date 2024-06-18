@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
+from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
 from common.pycon_std_plugins import PyConStdPlugins
@@ -70,9 +71,11 @@ class PyConMainWindow(QMainWindow):
 
     def save_settings(self):
 
-        self.settings.beginGroup("config")
-        self.settings.setValue("open_dir", self.open_dir)
-        self.settings.endGroup()
+        # self.settings.beginGroup("config")
+        self.settings.setValue("config/open_dir", self.open_dir)
+        self.settings.setValue("config/open_dir/param_1", "val_1")
+        self.settings.setValue("config/open_dir/param_2", "val_2")
+        # self.settings.endGroup()
 
         self.settings.beginGroup("PyConMainWindow")
         self.settings.setValue("geometry", self.geometry())
@@ -185,9 +188,13 @@ class PyConMainWindow(QMainWindow):
             self.settings.endGroup()
 
     def open_file(self):
-        self.settings.beginGroup("config")
-        _dir: str = self.settings.value("open_dir", "")
-        self.settings.endGroup()
+        # self.settings.beginGroup("config")
+        _dir: str = self.settings.value("config/open_dir", "")
+        param_1: str = self.settings.value("config/open_dir/param_1", "")
+        param_2: str = self.settings.value("config/open_dir/param_2", "")
+        logger().info(f"param_1:{param_1}")
+        logger().info(f"param_1:{param_2}")
+        # self.settings.endGroup()
 
         dlg = QFileDialog(directory=_dir)
 

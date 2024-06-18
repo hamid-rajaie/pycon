@@ -19,7 +19,7 @@ class PyConPluginBase(QMdiSubWindow):
         super().__init__()
 
         self.status: PyConPluginBase.PyConLineInternalStatus = PyConPluginBase.PyConLineInternalStatus.NOT_OK
-        self.settings = {"param_1": "val_1"}
+        self.settings = {}
 
     def initialize(self):
         pass
