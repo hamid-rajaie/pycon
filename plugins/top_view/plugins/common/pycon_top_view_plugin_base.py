@@ -27,7 +27,7 @@ class PyConTopViewPluginBase:
             PyConTopViewPluginBase.PyConLineInternalStatus.NOT_OK
         )
 
-    def init_data(self):
+    def initialize(self):
         pass
 
     def set_status_ok(self):

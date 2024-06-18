@@ -36,7 +36,8 @@ class PyConWindowPlugin_2(PyConPluginBase):
         super().__init__()
 
         self.pycon_data_source = params.pycon_data_source
-        self.settings = params.settings
+        self.initial_yaml_dir = params.initial_yaml_dir
+
         self.alias_signal_dict = params.alias_signal_dict
         self.missing_needed_signals = []
         self.missing_optional_signals = []
@@ -140,11 +141,7 @@ class PyConWindowPlugin_2(PyConPluginBase):
 
     def open_yaml_file(self):
 
-        self.settings.beginGroup("config")
-        _dir: str = self.settings.value("open_dir", "")
-        self.settings.endGroup()
-
-        dlg = QFileDialog(directory=_dir)
+        dlg = QFileDialog(directory=self.initial_yaml_dir)
 
         dlg.setNameFilters(get_pycon_config().pycon_start_yaml_filter)
         dlg.selectNameFilter(get_pycon_config().pycon_start_yaml_filter_selected)

@@ -77,7 +77,7 @@ class PyConPluginGeoMap(PyConPluginBase):
         """
         self.geo_map_view.load(url)
 
-    def init_data(self):
+    def initialize(self):
         try:
             self.time = self.pycon_data_source.get_channel(channel_name="timestamp")
             self.lon_wgs84 = self.pycon_data_source.get_channel(channel_name="lon_wgs84")

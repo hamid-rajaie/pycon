@@ -98,7 +98,7 @@ class PyConPluginSignalExplorer(PyConPluginBase):
         _widget.setLayout(_layout)
         self.setWidget(_widget)
 
-    def init_data(self):
+    def initialize(self):
         self.add_signals_to_tree_view()
 
     # ==========================================================================

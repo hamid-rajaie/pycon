@@ -1,19 +1,17 @@
 import os
 
-from PyQt5.QtCore import QSettings
-
 from data_sources.pycon_data_source import PyConDataSource
 
 
 class PyConPluginParams:
 
-    def __init__(self, selected_file_name: str, pycon_data_source: PyConDataSource, settings: QSettings) -> None:
+    def __init__(self, selected_file_name: str, pycon_data_source: PyConDataSource, initial_yaml_dir: str) -> None:
 
         self.pycon_data_source: PyConDataSource = pycon_data_source
 
-        self.settings: QSettings = settings
-
         self.alias_signal_dict = {}
+
+        self.initial_yaml_dir = ""
 
         self.video_name = os.path.join(
             os.path.dirname(selected_file_name),
