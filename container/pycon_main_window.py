@@ -4,11 +4,13 @@ import os
 from PyQt5.QtCore import QRect, QSettings
 from PyQt5.QtWidgets import (
     QAction,
+    QApplication,
     QFileDialog,
     QMainWindow,
     QMdiArea,
     QMdiSubWindow,
     QMenu,
+    QMessageBox,
     QTabWidget,
     QVBoxLayout,
     QWidget,
@@ -17,6 +19,7 @@ from PyQt5.QtWidgets import (
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
 from common.pycon_std_plugins import PyConStdPlugins
+from container.pycon_dialog_wait import PyConDialogWait
 from container.pycon_main_window_dialog_about import PyConAboutDialog
 from data_sources.pycon_data_source_csv import PyConDataSourceCsv
 from data_sources.pycon_data_source_mdf import PyConDataSourceMdf
@@ -89,8 +92,7 @@ class PyConMainWindow(QMainWindow):
         # save settings : plugins
         # ==================================================================
         if tab is not None and tab.plugins is not None:
-            plugins = tab.plugins
-            for plugin_menu_group, list_plugins in plugins.items():
+            for plugin_menu_group, list_plugins in tab.plugins.items():
                 for plugin in list_plugins:
                     if isinstance(plugin, QMdiSubWindow):
                         self.settings.beginGroup(plugin.windowTitle())
@@ -128,7 +130,7 @@ class PyConMainWindow(QMainWindow):
         dialog.exec_()
 
     def __discover_plugins(self, params: PyConPluginParams):
-        plugins = {}
+        detected_plugins = {}
 
         for plugin_cfg in get_pycon_config().pycon_plugins_cfg:
             plugin_package = plugin_cfg["plugin_package"]
@@ -136,7 +138,7 @@ class PyConMainWindow(QMainWindow):
             plugin_menu_group = plugin_cfg["plugin_menu_group"]
 
             if plugin_menu_group not in self.menu_groups.keys():
-                plugins[plugin_menu_group] = []
+                detected_plugins[plugin_menu_group] = []
 
             if os.path.isdir(plugin_dir):
                 for file_name in os.listdir(plugin_dir):
@@ -150,9 +152,9 @@ class PyConMainWindow(QMainWindow):
                                 and issubclass(item, PyConPluginBase)
                                 and item != PyConPluginBase
                             ):
-                                plugins[plugin_menu_group].append(item(params))
+                                detected_plugins[plugin_menu_group].append(item(params))
 
-        return plugins
+        return detected_plugins
 
     def __setup_plugin_geometry(self, tab_mdi_area, plugin, parent_menu):
         if isinstance(plugin, QMdiSubWindow):
@@ -199,11 +201,13 @@ class PyConMainWindow(QMainWindow):
             # ==================================================
             # Data Source
             # ==================================================
+            dlg_wait = PyConDialogWait(self, "Loading File")
             if file_basename_ext == ".csv":
                 pycon_data_source = PyConDataSourceCsv(file_name=selected_file_name)
 
             if file_basename_ext in [".mf4", ".MF4"]:
                 pycon_data_source = PyConDataSourceMdf(file_name=selected_file_name)
+            dlg_wait.hide_dialog()
             # ==================================================
             # add tab
             # ==================================================
@@ -225,55 +229,60 @@ class PyConMainWindow(QMainWindow):
             plugin_params = PyConPluginParams(
                 selected_file_name=selected_file_name, pycon_data_source=pycon_data_source, settings=self.settings
             )
-
-            # ==================================================================
-            # create std_plugins
-            # ==================================================================
-            std_plugins = PyConStdPlugins()
-            tab.std_plugins = std_plugins
-
-            std_plugins.plugin_control_panel = PyConPluginControlPanel()
-            std_plugins.plugin_signal_explorer = PyConPluginSignalExplorer(
-                pycon_data_source=plugin_params.pycon_data_source
-            )
-            # ==================================================================
-            # detect plugins
-            # ==================================================================
-            plugins = self.__discover_plugins(params=plugin_params)
-            tab.plugins = plugins
-            # ==================================================================
-            # init std plugins
-            # ==================================================================
-            menu_grp = QMenu("&Standard", self)
-            self.menu_plugins.addMenu(menu_grp)
-            self.menu_groups["std"] = menu_grp
-            for _, plugin in std_plugins.__dict__.items():
-                self.__setup_plugin_geometry(tab_mdi_area=tab_mdi_area, plugin=plugin, parent_menu=menu_grp)
-
-            # ==================================================================
-            # init plugins
-            # ==================================================================
-            for plugin_menu_group, list_plugins in plugins.items():
-                menu_grp = QMenu(plugin_menu_group, self)
-                self.menu_plugins.addMenu(menu_grp)
-                self.menu_groups[plugin_menu_group] = menu_grp
-
-                for plugin in list_plugins:
-                    self.__setup_plugin_geometry(tab_mdi_area=tab_mdi_area, plugin=plugin, parent_menu=menu_grp)
-
-            # ==================================================================
-            # init data std plugins
-            # ==================================================================
             if True:
+                # ==================================================================
+                # create std_plugins
+                #
+                # dlg_wait = PyConDialogWait(self, "Loading Plugins")
+                std_plugins = PyConStdPlugins()
+                tab.std_plugins = std_plugins
+
+                std_plugins.plugin_control_panel = PyConPluginControlPanel()
+                std_plugins.plugin_signal_explorer = PyConPluginSignalExplorer(
+                    pycon_data_source=plugin_params.pycon_data_source
+                )
+                #
+                # detect plugins
+                #
+                tab.plugins = self.__discover_plugins(params=plugin_params)
+                # dlg_wait.hide_dialog()
+
+            if True:
+                # ==================================================================
+                # init std plugins geoms
+                #
+                # dlg_wait = PyConDialogWait(self, "Initializing Plugin Geometries")
+                menu_grp = QMenu("&Standard", self)
+                self.menu_plugins.addMenu(menu_grp)
+                self.menu_groups["std"] = menu_grp
+                for _, plugin in std_plugins.__dict__.items():
+                    self.__setup_plugin_geometry(tab_mdi_area=tab_mdi_area, plugin=plugin, parent_menu=menu_grp)
+                #
+                # init tab.plugins geoms
+                #
+                for plugin_menu_group, list_plugins in tab.plugins.items():
+                    menu_grp = QMenu(plugin_menu_group, self)
+                    self.menu_plugins.addMenu(menu_grp)
+                    self.menu_groups[plugin_menu_group] = menu_grp
+
+                    for plugin in list_plugins:
+                        self.__setup_plugin_geometry(tab_mdi_area=tab_mdi_area, plugin=plugin, parent_menu=menu_grp)
+                # dlg_wait.hide_dialog()
+
+            if True:
+                dlg_wait = PyConDialogWait(self, "Initializing Plugin Data")
+                # ==================================================================
+                # init data std tab.plugins
+                #
                 for _, plugin in std_plugins.__dict__.items():
                     plugin.init_data()
-                # ==================================================================
-                # init data plugins
-                # ==================================================================
-                for plugin_menu_group, list_plugins in plugins.items():
+                #
+                # init data tab.plugins
+                #
+                for plugin_menu_group, list_plugins in tab.plugins.items():
                     for plugin in list_plugins:
                         plugin.init_data()
-
+                dlg_wait.hide_dialog()
             # ==================================================
             # connect plugin_signal_explorer to plugin_control_panel
             # ==================================================
@@ -282,14 +291,14 @@ class PyConMainWindow(QMainWindow):
             )
             # ==================================================================
             # add connections
-            # connect std panels to plugins
+            # connect std panels to tab.plugins
             # ==================================================================
-            for plugin_menu_group, list_plugins in plugins.items():
+            for plugin_menu_group, list_plugins in tab.plugins.items():
                 for plugin in list_plugins:
                     if isinstance(plugin, QMdiSubWindow):
 
-                        def lambda_generator(plugin):
-                            return plugin.slot_add_signal_by_double_click
+                        # def lambda_generator(plugin):
+                        #    return plugin.slot_add_signal_by_double_click
 
                         # ==================================================================
                         # connect : plugin_signal_explorer   signal_explorer_double_click

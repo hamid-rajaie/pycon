@@ -31,6 +31,7 @@ class PyConConfig:
 
         # convert sec to msec
         self.pycon_conversion_factor__time_sec_to_msec = 1000
+        self.pycon_time_signals = ["time", "t", "timestamp"]
 
         self.pycon_plugins_cfg = [
             {

@@ -7,8 +7,10 @@ from PyQt5.QtWidgets import QHeaderView, QMenu, QTableWidget, QTableWidgetItem, 
 from common.delegates.pycon_window_signal_explorer_delegate import PyConWindowSignalExplorerDelegate
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
+from container.pycon_dialog_wait import PyConDialogWait
 from data_sources.pycon_data_source import PyConDataSource
 from data_sources.pycon_standard_item import PyConStandardItem
+from pycon_config import get_pycon_config
 
 
 class PyConPluginSignalExplorer(PyConPluginBase):
@@ -46,8 +48,6 @@ class PyConPluginSignalExplorer(PyConPluginBase):
         self.delegate.newSearch.connect(self.slot_search)
 
         self.__initUI()
-
-        self.add_signals_to_tree_view()
 
     def __initUI(self):
         initial_row_count = 2
@@ -98,6 +98,9 @@ class PyConPluginSignalExplorer(PyConPluginBase):
         _widget.setLayout(_layout)
         self.setWidget(_widget)
 
+    def init_data(self):
+        self.add_signals_to_tree_view()
+
     # ==========================================================================
     # search
     # ==========================================================================
@@ -144,18 +147,16 @@ class PyConPluginSignalExplorer(PyConPluginBase):
         channel_group_comment = parentStandardItem.text()
 
         channel_index_timestamp = 0
-        time_signals = ["time", "t", "timestamp"]
 
         time = None
 
-        for sig_time in time_signals:
+        for sig_time in get_pycon_config().pycon_time_signals:
             try:
-                time = self.pycon_data_source.get_channel(
-                    channel_name=sig_time, group_index=channel_group_index, channel_index=channel_index_timestamp
-                )
-                logger().info(f"{sig_time} found")
+                time = self.pycon_data_source.get_channel(channel_name=sig_time, group_index=channel_group_index)
+                # logger().info(f"{sig_time} found")
             except Exception:
-                logger().warning(f"{sig_time} not found")
+                # logger().warning(f"{sig_time} not found")
+                pass
 
         if time is None:
             logger().warning("no time signal found")
@@ -183,6 +184,7 @@ class PyConPluginSignalExplorer(PyConPluginBase):
     # add signals
     # ==========================================================================
     def add_signals_to_tree_view(self):
+
         self.signal_tree_view.model().removeRows(0, self.signal_tree_view.model().rowCount())
 
         for group_index, group in enumerate(self.pycon_data_source.data.groups):

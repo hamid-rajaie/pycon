@@ -30,4 +30,5 @@ class PyConDataSourceMdf(PyConDataSource):
         return self.data.groups
 
     def get_channel(self, channel_name: str, group_index: int = None, channel_index: int = None):
+        # logger().info(f"channel_name:{channel_name}  group_index:{group_index}  channel_index:{channel_index}")
         return self.data.get(channel_name, group_index, channel_index)
