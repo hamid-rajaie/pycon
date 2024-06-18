@@ -83,13 +83,13 @@ class PyConPluginGeoMap(PyConPluginBase):
             self.lon_wgs84 = self.pycon_data_source.get_channel(channel_name="lon_wgs84")
             self.lat_wgs84 = self.pycon_data_source.get_channel(channel_name="lat_wgs84")
             self.set_status_ok()
-            self.render_geo_map()
+            self.__render_geo_map()
 
             self.signal_time_loaded.emit(self.time.samples[0], self.time.samples[-1])
         except Exception as ex:
             logger().warning(str(ex))
 
-    def render_geo_map(self):
+    def __render_geo_map(self):
         try:
             self.geo_map = folium.Map(location=[48.8366488, 9.0966474], zoom_start=13)
 
