@@ -66,6 +66,9 @@ class PyConMainWindow(QMainWindow):
         self.show()
 
     def closeEvent(self, e):
+        self.save_settings()
+
+    def save_settings(self):
 
         self.settings.beginGroup("config")
         self.settings.setValue("open_dir", self.open_dir)
@@ -76,29 +79,29 @@ class PyConMainWindow(QMainWindow):
         self.settings.endGroup()
 
         tab = self.tab_widget.currentWidget()
-        # ==================================================================
-        # save settings : std plugins
-        # ==================================================================
-        if tab is not None and tab.std_plugins is not None:
-            std_plugins: PyConStdPlugins = tab.std_plugins
 
-            for _, plugin in std_plugins.__dict__.items():
-                if isinstance(plugin, QMdiSubWindow):
-                    self.settings.beginGroup(plugin.windowTitle())
-                    self.settings.setValue("visible", plugin.isVisible())
-                    self.settings.setValue("geometry", plugin.geometry())
-                    self.settings.endGroup()
         # ==================================================================
-        # save settings : plugins
+        # save plugin settings
         # ==================================================================
-        if tab is not None and tab.plugins is not None:
-            for plugin_menu_group, list_plugins in tab.plugins.items():
-                for plugin in list_plugins:
+        def local_save(plugin):
+            self.settings.beginGroup(plugin.windowTitle())
+            self.settings.setValue("visible", plugin.isVisible())
+            self.settings.setValue("geometry", plugin.geometry())
+            for key, val in plugin.get_settings().items():
+                self.settings.setValue(key, val)
+            self.settings.endGroup()
+
+        if tab is not None:
+            if tab.std_plugins is not None:
+                for _, plugin in tab.std_plugins.__dict__.items():
                     if isinstance(plugin, QMdiSubWindow):
-                        self.settings.beginGroup(plugin.windowTitle())
-                        self.settings.setValue("visible", plugin.isVisible())
-                        self.settings.setValue("geometry", plugin.geometry())
-                        self.settings.endGroup()
+                        local_save(plugin)
+
+            if tab.plugins is not None:
+                for plugin_menu_group, list_plugins in tab.plugins.items():
+                    for plugin in list_plugins:
+                        if isinstance(plugin, QMdiSubWindow):
+                            local_save(plugin)
 
     def __create_menu_bar(self):
         action_open = QAction("Open...", self)
