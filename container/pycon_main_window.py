@@ -36,7 +36,7 @@ class PyConMainWindow(QMainWindow):
 
         self.open_dir = None
 
-        self.menu_groups = {}
+        self.menu_created = False
         # ======================================================================
         # app setting
         # ======================================================================
@@ -134,7 +134,7 @@ class PyConMainWindow(QMainWindow):
         dialog = PyConAboutDialog()
         dialog.exec_()
 
-    def __setup_plugin_geometry(self, tab_mdi_area, plugin, parent_menu):
+    def __setup_plugin_geometry(self, tab_mdi_area, plugin):
         if isinstance(plugin, QMdiSubWindow):
             self.settings.beginGroup(plugin.windowTitle())
             visible: bool = self.settings.value("visible", False, type=bool)
@@ -143,14 +143,6 @@ class PyConMainWindow(QMainWindow):
             plugin.setGeometry(geometry)
 
             tab_mdi_area.addSubWindow(plugin)
-
-            def lambda_generator(plugin):
-                return lambda: plugin.show()
-
-            action = QAction(plugin.windowTitle(), self)
-            action.triggered.connect(lambda_generator(plugin))
-
-            parent_menu.addAction(action)
 
             if visible:
                 plugin.show()
@@ -206,29 +198,41 @@ class PyConMainWindow(QMainWindow):
             plugin_params = PyConPluginParams(
                 selected_file_name=selected_file_name, pycon_data_source=pycon_data_source, initial_yaml_dir=_dir
             )
-            tab.plugins = PyConPlugins(plugin_params=plugin_params, menu_groups=self.menu_groups)
+            tab.plugins = PyConPlugins(plugin_params=plugin_params)
+            # ==================================================================
+            # setup main menu
+            # ==================================================================
+            if not self.menu_created:
+                menu_grp = QMenu("&Standard", self)
+                self.menu_plugins.addMenu(menu_grp)
+
+                for plugin_menu_group, list_plugins in tab.plugins.detected_plugins.items():
+                    menu_grp = QMenu(plugin_menu_group, self)
+                    self.menu_plugins.addMenu(menu_grp)
+
+                    def lambda_generator(plugin):
+                        return lambda: plugin.show()
+
+                    for plugin in list_plugins:
+                        action = QAction(plugin.windowTitle(), self)
+                        action.triggered.connect(lambda_generator(plugin))
+
+                        menu_grp.addAction(action)
+
+                self.menu_created = True
             # ==================================================================
             # setup plugin geometries
             # ==================================================================
-            # dlg_wait = PyConDialogWait(self, "Initializing Plugin Geometries")
-            menu_grp = QMenu("&Standard", self)
-            self.menu_plugins.addMenu(menu_grp)
-            self.menu_groups["std"] = menu_grp
             for _, plugin in tab.plugins.std_plugins.__dict__.items():
-                self.__setup_plugin_geometry(tab_mdi_area=tab_mdi_area, plugin=plugin, parent_menu=menu_grp)
+                self.__setup_plugin_geometry(tab_mdi_area=tab_mdi_area, plugin=plugin)
 
             for plugin_menu_group, list_plugins in tab.plugins.detected_plugins.items():
-                menu_grp = QMenu(plugin_menu_group, self)
-                self.menu_plugins.addMenu(menu_grp)
-                self.menu_groups[plugin_menu_group] = menu_grp
-
                 for plugin in list_plugins:
-                    self.__setup_plugin_geometry(tab_mdi_area=tab_mdi_area, plugin=plugin, parent_menu=menu_grp)
-            # dlg_wait.hide_dialog()
+                    self.__setup_plugin_geometry(tab_mdi_area=tab_mdi_area, plugin=plugin)
             # ==============================================================
             # initialize  plugins
             # ==============================================================
             dlg_wait = PyConDialogWait(self, "Initializing Plugin Data")
             tab.plugins.initialize()
-            dlg_wait.hide_dialog()
             tab.plugins.connect()
+            dlg_wait.hide_dialog()

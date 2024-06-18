@@ -11,12 +11,13 @@ from pycon_config import get_pycon_config
 
 class PyConPlugins:
 
-    def __init__(self, plugin_params: PyConPluginParams, menu_groups):
+    def __init__(self, plugin_params: PyConPluginParams):
         self.plugin_params = plugin_params
         self.std_plugins = PyConStdPlugins()
+        #
+        # {'plugin_menu_group_1' : [] , 'plugin_menu_group_2' : [] }
+        #
         self.detected_plugins = {}
-
-        self.menu_groups = menu_groups
 
         self.__create_std_plugin()
         self.__discover_plugins()
@@ -71,7 +72,7 @@ class PyConPlugins:
             plugin_dir = plugin_cfg["plugin_dir"]
             plugin_menu_group = plugin_cfg["plugin_menu_group"]
 
-            if plugin_menu_group not in self.menu_groups.keys():
+            if plugin_menu_group not in self.detected_plugins.keys():
                 self.detected_plugins[plugin_menu_group] = []
 
             if os.path.isdir(plugin_dir):
