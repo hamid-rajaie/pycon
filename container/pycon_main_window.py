@@ -1,32 +1,25 @@
-import importlib
 import os
 
 from PyQt5.QtCore import QRect, QSettings
 from PyQt5.QtWidgets import (
     QAction,
-    QApplication,
     QFileDialog,
     QMainWindow,
     QMdiArea,
     QMdiSubWindow,
     QMenu,
-    QMessageBox,
     QTabWidget,
     QVBoxLayout,
     QWidget,
 )
 
-from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
-from common.pycon_std_plugins import PyConStdPlugins
 from container.pycon_dialog_wait import PyConDialogWait
 from container.pycon_main_window_dialog_about import PyConAboutDialog
 from container.pycon_plugins import PyConPlugins
 from data_sources.pycon_data_source_csv import PyConDataSourceCsv
 from data_sources.pycon_data_source_mdf import PyConDataSourceMdf
-from plugins_std.pycon_plugin_control_panel import PyConPluginControlPanel
-from plugins_std.pycon_plugin_signal_explorer import PyConPluginSignalExplorer
 from pycon_config import get_pycon_config
 
 
@@ -181,16 +174,12 @@ class PyConMainWindow(QMainWindow):
             # add tab
             # ==================================================
             tab_mdi_area = QMdiArea()
-
             tab = QWidget()
-
             self.tab_widget.addTab(tab, file_basename)
             self.tab_widget.setCurrentWidget(tab)
-
             tab_layout = QVBoxLayout()
             tab_layout.addWidget(tab_mdi_area)
             tab.setLayout(tab_layout)
-
             tab_mdi_area.setGeometry(tab.geometry())
             # ==================================================================
             # create params
