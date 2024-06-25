@@ -6,7 +6,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGridLayout, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QAction, QGridLayout, QMenu, QVBoxLayout, QWidget
 
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
@@ -56,19 +56,15 @@ class PyConWindowTopView(PyConPluginBase):
         self.widget_1.setAutoFillBackground(True)
         pal_1.setColor(self.widget_1.backgroundRole(), Qt.white)
         self.widget_1.setPalette(pal_1)
-        #
-        # create a layout, containing :
-        #  1. the table widget
-        #  2. the tree view
-        #
-        _layout = QVBoxLayout()
-        _layout.addWidget(self.widget_1)
-        #
-        # widget of self
-        #
-        _widget = QWidget()
-        _widget.setLayout(_layout)
-        self.setWidget(_widget)
+
+        super().initUI(widget=self.widget_1, opt_menubar=True)
+
+        menu_needed_signals = QMenu("&Needed Signals", self)
+        self.menubar().addMenu(menu_needed_signals)
+
+        for signal in self.needed_signals_names():
+            action_signal = QAction(signal, self)
+            menu_needed_signals.addAction(action_signal)
 
     def get_settings(self):
         for plugin in self.plugins:

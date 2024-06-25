@@ -30,6 +30,14 @@ class PyConPlugins:
             for plugin in list_plugins:
                 plugin.initialize()
 
+    def get_needed_signals(self):
+        for _, plugin in self.std_plugins.__dict__.items():
+            plugin.get_needed_signals()
+
+        for plugin_menu_group, list_plugins in self.detected_plugins.items():
+            for plugin in list_plugins:
+                plugin.get_needed_signals()
+
     def connect(self):
         # ==================================================
         # connect plugin_signal_explorer to plugin_control_panel

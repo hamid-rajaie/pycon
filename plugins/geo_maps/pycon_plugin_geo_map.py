@@ -6,7 +6,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import QObject, pyqtSlot
 from PyQt5.QtWebChannel import QWebChannel
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtWidgets import QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QAction, QMenu, QMenuBar, QVBoxLayout, QWidget
 
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
@@ -40,17 +40,16 @@ class PyConPluginGeoMap(PyConPluginBase):
 
         self.setWindowTitle("Geo Map")
 
-        self.win_widget = None
         self.geo_map_view = None
         self.backend = Backend()
         self.channel = QWebChannel()
         self.channel.registerObject("backend", self.backend)
 
-        self.pycon_canvas = None
+        self.add_needed_signal("timestamp")
+        self.add_needed_signal("lon_wgs84")
+        self.add_needed_signal("lat_wgs84")
 
-        self.time = None
-        self.lon_wgs84 = None
-        self.lat_wgs84 = None
+        self.pycon_canvas = None
 
         self.geo_map = None
 
@@ -60,32 +59,22 @@ class PyConPluginGeoMap(PyConPluginBase):
         self.geo_map_view = QWebEngineView()
         self.geo_map_view.page().setWebChannel(self.channel)
 
-        _layout = QVBoxLayout()
-        _layout.addWidget(self.geo_map_view)
+        super().initUI(widget=self.geo_map_view, opt_menubar=True)
 
-        self.win_widget = QWidget()
-        self.win_widget.setLayout(_layout)
-        self.setWidget(self.geo_map_view)
+        menu_needed_signals = QMenu("&Needed Signals", self)
+        self.menubar().addMenu(menu_needed_signals)
 
-    def load(self, url):
-        """
-        USAGE
-            self.win_widget.load(QUrl("http://qt-project.org/"))
-
-            url = QtCore.QUrl.fromLocalFile(file_full_path)
-            self.win_widget..load(url=url)
-        """
-        self.geo_map_view.load(url)
+        for signal in self.needed_signals_names():
+            action_signal = QAction(signal, self)
+            menu_needed_signals.addAction(action_signal)
 
     def initialize(self):
         try:
-            self.time = self.pycon_data_source.get_channel(channel_name="timestamp")
-            self.lon_wgs84 = self.pycon_data_source.get_channel(channel_name="lon_wgs84")
-            self.lat_wgs84 = self.pycon_data_source.get_channel(channel_name="lat_wgs84")
-            self.set_status_ok()
             self.__render_geo_map()
 
-            self.signal_time_loaded.emit(self.time.samples[0], self.time.samples[-1])
+            self.signal_time_loaded.emit(
+                self.get_signal("timestamp").samples[0], self.get_signal("timestamp").samples[-1]
+            )
         except Exception as ex:
             logger().warning(str(ex))
 
@@ -111,10 +100,10 @@ class PyConPluginGeoMap(PyConPluginBase):
 
         time_sec = time.get_time_sec()
 
-        idx, t = find_nearest_time(arr=self.time.samples, value=time_sec)
+        idx, t = find_nearest_time(arr=self.get_signal("timestamp").samples, value=time_sec)
 
-        lon_wgs84 = self.lon_wgs84.samples[idx]
-        lat_wgs84 = self.lat_wgs84.samples[idx]
+        lon_wgs84 = self.get_signal("lon_wgs84").samples[idx]
+        lat_wgs84 = self.get_signal("lat_wgs84").samples[idx]
 
         self.__add_marker(latitude=lat_wgs84, longitude=lon_wgs84)
 

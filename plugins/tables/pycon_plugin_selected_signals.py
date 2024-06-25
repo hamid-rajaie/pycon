@@ -1,7 +1,7 @@
 import numpy as np
 from PyQt5 import QtCore
 from PyQt5.QtGui import QStandardItemModel
-from PyQt5.QtWidgets import QMenu, QTreeView, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QAction, QMenu, QMenuBar, QTreeView, QVBoxLayout, QWidget
 
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
@@ -46,18 +46,8 @@ class PyConWindowSelectedSignals(PyConPluginBase):
         self.root_node = self.signal_tree_model.invisibleRootItem()
 
         self.signal_tree_view.setModel(self.signal_tree_model)
-        #
-        # create a layout, containing :
-        #  1. the tree view
-        #
-        _layout = QVBoxLayout()
-        _layout.addWidget(self.signal_tree_view)
-        #
-        # widget of self
-        #
-        _widget = QWidget()
-        _widget.setLayout(_layout)
-        self.setWidget(_widget)
+
+        super().initUI(widget=self.signal_tree_view, opt_menubar=False)
 
     # ==========================================================================
     # context menu
