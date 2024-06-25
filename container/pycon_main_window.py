@@ -1,17 +1,7 @@
 import os
 
 from PyQt5.QtCore import QRect, QSettings
-from PyQt5.QtWidgets import (
-    QAction,
-    QFileDialog,
-    QMainWindow,
-    QMdiArea,
-    QMdiSubWindow,
-    QMenu,
-    QTabWidget,
-    QVBoxLayout,
-    QWidget,
-)
+from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMdiArea, QMenu, QTabWidget, QVBoxLayout, QWidget
 
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
@@ -128,7 +118,7 @@ class PyConMainWindow(QMainWindow):
         dialog.exec_()
 
     def __setup_plugin_geometry(self, tab_mdi_area, plugin):
-        if isinstance(plugin, QMdiSubWindow):
+        if isinstance(plugin, PyConPluginBase):
             self.settings.beginGroup(plugin.windowTitle())
             visible: bool = self.settings.value("visible", False, type=bool)
             geometry: QRect = self.settings.value("geometry", QRect(0, 0, 400, 400))
