@@ -23,7 +23,10 @@ class PyConPluginBase(QMdiSubWindow):
         self.status: PyConPluginBase.PyConLineInternalStatus = PyConPluginBase.PyConLineInternalStatus.NOT_OK
         self.settings = {}
 
-        self.__needed_signals = {}
+        #
+        # { "signal_1" : "real signal name in csv/mf4", "signal_2" : "real signal name in csv/mf4"}
+        #
+        self.__plugin_signals = {}
 
     def initUI(self, widget: QWidget, opt_menubar: bool = False):
         self.__layout = QVBoxLayout()
@@ -39,20 +42,20 @@ class PyConPluginBase(QMdiSubWindow):
     def menubar(self):
         return self.__menu_bar
 
-    def add_needed_signal(self, signal: str):
-        self.__needed_signals[signal] = None
+    def add_plugin_channel(self, signal: str):
+        self.__plugin_signals[signal] = None
 
-    def get_signal(self, signal) -> dict:
-        return self.__needed_signals[signal]
+    def get_plugin_channel(self, signal) -> dict:
+        return self.__plugin_signals[signal]
 
     def needed_signals_names(self) -> list[str]:
-        return self.__needed_signals.keys()
+        return self.__plugin_signals.keys()
 
-    def get_needed_signals(self):
+    def read_plugin_channels(self):
         self.set_status_ok()
-        for channel_name in self.__needed_signals.keys():
+        for channel_name in self.__plugin_signals.keys():
             try:
-                self.__needed_signals[channel_name] = self.pycon_data_source.get_channel(channel_name=channel_name)
+                self.__plugin_signals[channel_name] = self.pycon_data_source.get_channel(channel_name=channel_name)
 
             except Exception as ex:
                 logger().warning(str(ex))
