@@ -1,6 +1,8 @@
 import importlib
 import os
 
+from PyQt5.QtCore import QSettings
+
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
 from common.pycon_std_plugins import PyConStdPlugins
@@ -66,6 +68,27 @@ class PyConPlugins:
                     self.std_plugins.plugin_control_panel.control_panel_slider_value_changed.connect(
                         plugin.slider_value_changed
                     )
+
+    def save_settings(self, settings: QSettings):
+        # ==================================================================
+        # save plugin settings
+        # ==================================================================
+        def local_save(plugin):
+            settings.beginGroup(plugin.windowTitle())
+            settings.setValue("visible", plugin.isVisible())
+            settings.setValue("geometry", plugin.geometry())
+            for key, val in plugin.get_settings().items():
+                settings.setValue(key, val)
+            settings.endGroup()
+
+        for _, plugin in self.std_plugins.__dict__.items():
+            if isinstance(plugin, PyConPluginBase):
+                local_save(plugin)
+
+        for plugin_menu_group, list_plugins in self.detected_plugins.items():
+            for plugin in list_plugins:
+                if isinstance(plugin, PyConPluginBase):
+                    local_save(plugin)
 
     def __create_std_plugin(self):
         self.std_plugins.plugin_control_panel = PyConPluginControlPanel()

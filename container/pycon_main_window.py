@@ -65,28 +65,8 @@ class PyConMainWindow(QMainWindow):
 
         tab = self.tab_widget.currentWidget()
 
-        # ==================================================================
-        # save plugin settings
-        # ==================================================================
-        def local_save(plugin):
-            self.settings.beginGroup(plugin.windowTitle())
-            self.settings.setValue("visible", plugin.isVisible())
-            self.settings.setValue("geometry", plugin.geometry())
-            for key, val in plugin.get_settings().items():
-                self.settings.setValue(key, val)
-            self.settings.endGroup()
-
         if tab is not None:
-            if tab.plugins.std_plugins is not None:
-                for _, plugin in tab.plugins.std_plugins.__dict__.items():
-                    if isinstance(plugin, PyConPluginBase):
-                        local_save(plugin)
-
-            if tab.plugins.detected_plugins is not None:
-                for plugin_menu_group, list_plugins in tab.plugins.detected_plugins.items():
-                    for plugin in list_plugins:
-                        if isinstance(plugin, PyConPluginBase):
-                            local_save(plugin)
+            tab.plugins.save_settings(settings=self.settings)
 
     def __create_menu_bar(self):
         action_open = QAction("Open...", self)
@@ -116,23 +96,6 @@ class PyConMainWindow(QMainWindow):
     def about(self):
         dialog = PyConAboutDialog()
         dialog.exec_()
-
-    def __setup_plugin_geometry(self, tab_mdi_area, plugin):
-        if isinstance(plugin, PyConPluginBase):
-            self.settings.beginGroup(plugin.windowTitle())
-            visible: bool = self.settings.value("visible", False, type=bool)
-            geometry: QRect = self.settings.value("geometry", QRect(0, 0, 400, 400))
-
-            plugin.setGeometry(geometry)
-
-            tab_mdi_area.addSubWindow(plugin)
-
-            if visible:
-                plugin.show()
-            else:
-                plugin.hide()
-
-            self.settings.endGroup()
 
     def open_file(self):
         self.settings.beginGroup("config")
@@ -216,3 +179,20 @@ class PyConMainWindow(QMainWindow):
             tab.plugins.initialize()
             tab.plugins.connect()
             dlg_wait.hide_dialog()
+
+    def __setup_plugin_geometry(self, tab_mdi_area, plugin):
+        if isinstance(plugin, PyConPluginBase):
+            self.settings.beginGroup(plugin.windowTitle())
+            visible: bool = self.settings.value("visible", False, type=bool)
+            geometry: QRect = self.settings.value("geometry", QRect(0, 0, 400, 400))
+
+            plugin.setGeometry(geometry)
+
+            tab_mdi_area.addSubWindow(plugin)
+
+            if visible:
+                plugin.show()
+            else:
+                plugin.hide()
+
+            self.settings.endGroup()
