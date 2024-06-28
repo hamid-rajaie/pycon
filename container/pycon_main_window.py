@@ -5,9 +5,9 @@ from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QMdiArea, QMenu, 
 
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
+from common.plugins.pycon_plugins import PyConPlugins
 from container.pycon_dialog_wait import PyConDialogWait
 from container.pycon_main_window_dialog_about import PyConAboutDialog
-from container.pycon_plugins import PyConPlugins
 from data_sources.pycon_data_source_csv import PyConDataSourceCsv
 from data_sources.pycon_data_source_mdf import PyConDataSourceMdf
 from pycon_config import get_pycon_config

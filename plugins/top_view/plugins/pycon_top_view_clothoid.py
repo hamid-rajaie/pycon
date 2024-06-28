@@ -2,14 +2,11 @@ from enum import Enum
 
 import matplotlib.axes as axes
 import numpy as np
-from PyQt5 import QtCore
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMdiSubWindow
 
 from common.logging.logger import logger
 from common.pycon_numpy import find_nearest_time
-from plugins.top_view.plugins.common.pycon_top_view_params import PyConTopViewParams
-from plugins.top_view.plugins.common.pycon_top_view_plugin_base import PyConTopViewPluginBase
+from plugins.top_view.common.pycon_top_view_params import PyConTopViewParams
+from plugins.top_view.common.pycon_top_view_plugin_base import PyConTopViewPluginBase
 
 
 class PyConTopViewClothoid(PyConTopViewPluginBase):

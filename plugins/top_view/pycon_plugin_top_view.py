@@ -11,8 +11,8 @@ from PyQt5.QtWidgets import QAction, QGridLayout, QMenu, QVBoxLayout, QWidget
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
-from plugins.top_view.plugins.common.pycon_top_view_params import PyConTopViewParams
-from plugins.top_view.plugins.common.pycon_top_view_plugin_base import PyConTopViewPluginBase
+from plugins.top_view.common.pycon_top_view_params import PyConTopViewParams
+from plugins.top_view.common.pycon_top_view_plugin_base import PyConTopViewPluginBase
 from plugins_std.pycon_time import PyConTime
 from pycon_config import get_pycon_config
 

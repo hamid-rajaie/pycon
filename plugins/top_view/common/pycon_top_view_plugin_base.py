@@ -1,16 +1,7 @@
 from enum import Enum
 
 import matplotlib.axes as axes
-import matplotlib.pyplot as plt
-import numpy as np
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.lines import Line2D
-from PyQt5 import QtCore
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMdiSubWindow
-
-from common.logging.logger import logger
 
 
 class PyConTopViewPluginBase:
