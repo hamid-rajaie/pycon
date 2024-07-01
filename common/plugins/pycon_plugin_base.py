@@ -1,32 +1,21 @@
-from enum import Enum
-
 import numpy as np
 from PyQt5 import QtCore
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QAction, QMdiSubWindow, QMenu, QMenuBar, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QMdiSubWindow, QMenuBar, QVBoxLayout, QWidget
 
 from common.logging.logger import logger
+from common.plugins.pycon_generic_signal_set import PyConGenericSignalSet
+from common.plugins.pycon_state import PyConState
 from plugins_std.pycon_time import PyConTime
 
 
-class PyConPluginBase(QMdiSubWindow):
-
-    class PyConLineInternalStatus(Enum):
-        OK = "ok"
-        NOT_OK = "not_ok"
+class PyConPluginBase(QMdiSubWindow, PyConGenericSignalSet):
 
     def __init__(self):
         super().__init__()
 
         self.__layout = None
 
-        self.status: PyConPluginBase.PyConLineInternalStatus = PyConPluginBase.PyConLineInternalStatus.NOT_OK
         self.settings = {}
-
-        #
-        # { "signal_1" : "real signal name in csv/mf4", "signal_2" : "real signal name in csv/mf4"}
-        #
-        self.__plugin_signals = {}
 
     def initUI(self, widget: QWidget, opt_menubar: bool = False):
         self.__layout = QVBoxLayout()
@@ -42,46 +31,11 @@ class PyConPluginBase(QMdiSubWindow):
     def menubar(self):
         return self.__menu_bar
 
-    def add_plugin_channel(self, signal: str):
-        self.__plugin_signals[signal] = None
-
-    def get_plugin_channel(self, signal) -> dict:
-        return self.__plugin_signals[signal]
-
-    def needed_signals_names(self) -> list[str]:
-        return self.__plugin_signals.keys()
-
-    def read_plugin_channels(self):
-        self.set_status_ok()
-        for channel_name in self.__plugin_signals.keys():
-            try:
-                self.__plugin_signals[channel_name] = self.pycon_data_source.get_channel(channel_name=channel_name)
-
-            except Exception as ex:
-                logger().warning(str(ex))
-                self.set_status_not_ok()
-
     def initialize(self):
         pass
 
     def get_settings(self):
         return self.settings
-
-    def set_status_ok(self):
-        self.status: PyConPluginBase.PyConLineInternalStatus = PyConPluginBase.PyConLineInternalStatus.OK
-
-    def set_status_not_ok(self):
-        self.status: PyConPluginBase.PyConLineInternalStatus = PyConPluginBase.PyConLineInternalStatus.NOT_OK
-
-    def is_status_ok(self):
-        if self.status == PyConPluginBase.PyConLineInternalStatus.OK:
-            return True
-        return False
-
-    def is_status_not_ok(self):
-        if self.status == PyConPluginBase.PyConLineInternalStatus.NOT_OK:
-            return True
-        return False
 
     def eventFilter(self, obj, event):
         if obj == self.widget() and event.type() == event.Close and obj.close():

@@ -45,9 +45,9 @@ class PyConPluginGeoMap(PyConPluginBase):
         self.channel = QWebChannel()
         self.channel.registerObject("backend", self.backend)
 
-        self.add_plugin_channel("timestamp")
-        self.add_plugin_channel("lon_wgs84")
-        self.add_plugin_channel("lat_wgs84")
+        self.add_generic_channel(generic_signal="timestamp")
+        self.add_generic_channel(generic_signal="lon_wgs84")
+        self.add_generic_channel(generic_signal="lat_wgs84")
 
         self.pycon_canvas = None
 
@@ -64,7 +64,7 @@ class PyConPluginGeoMap(PyConPluginBase):
         menu_needed_signals = QMenu("&Needed Signals", self)
         self.menubar().addMenu(menu_needed_signals)
 
-        for signal in self.needed_signals_names():
+        for signal in self.get_generic_names():
             action_signal = QAction(signal, self)
             menu_needed_signals.addAction(action_signal)
 
@@ -73,7 +73,7 @@ class PyConPluginGeoMap(PyConPluginBase):
             self.__render_geo_map()
 
             self.signal_time_loaded.emit(
-                self.get_plugin_channel("timestamp").samples[0], self.get_plugin_channel("timestamp").samples[-1]
+                self.get_generic_channel("timestamp").samples[0], self.get_generic_channel("timestamp").samples[-1]
             )
         except Exception as ex:
             logger().warning(str(ex))
@@ -100,10 +100,10 @@ class PyConPluginGeoMap(PyConPluginBase):
 
         time_sec = time.get_time_sec()
 
-        idx, t = find_nearest_time(arr=self.get_plugin_channel("timestamp").samples, value=time_sec)
+        idx, t = find_nearest_time(arr=self.get_generic_channel("timestamp").samples, value=time_sec)
 
-        lon_wgs84 = self.get_plugin_channel("lon_wgs84").samples[idx]
-        lat_wgs84 = self.get_plugin_channel("lat_wgs84").samples[idx]
+        lon_wgs84 = self.get_generic_channel("lon_wgs84").samples[idx]
+        lat_wgs84 = self.get_generic_channel("lat_wgs84").samples[idx]
 
         self.__add_marker(latitude=lat_wgs84, longitude=lon_wgs84)
 
