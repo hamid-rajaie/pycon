@@ -1,3 +1,4 @@
+from common.logging.logger import logger
 from common.plugins.pycon_plugin_state import PyConPluginState
 
 
@@ -18,7 +19,10 @@ class PyConPluginSignalSet(PyConPluginState):
         self.__dict = {}
 
     def add_generic_channel(self, generic_signal: str):
-        self.__dict[generic_signal] = PyConSignal()
+        signal: PyConSignal = PyConSignal()
+        signal.channel_name = generic_signal
+
+        self.__dict[generic_signal] = signal
 
     def get_generic_channel(self, generic_signal) -> dict:
 
@@ -28,12 +32,12 @@ class PyConPluginSignalSet(PyConPluginState):
     def get_generic_names(self) -> list[str]:
         return self.__dict.keys()
 
-    def read_plugin_channels(self):
+    def read_generic_channels(self):
         self.set_status_ok()
         for generic_name in self.__dict.keys():
             try:
                 signal: PyConSignal = self.__dict[generic_name]
-                signal.channel = self.pycon_data_source.get_channel(channel_name=generic_name)
+                signal.channel = self.pycon_data_source.get_channel(channel_name=signal.channel_name)
 
             except Exception as ex:
                 logger().warning(str(ex))

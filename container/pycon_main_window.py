@@ -178,7 +178,7 @@ class PyConMainWindow(QMainWindow):
             # initialize  plugins
             # ==============================================================
             dlg_wait = PyConDialogWait(self, "Initializing Plugin Data")
-            tab.plugins.read_plugin_channels()
+            tab.plugins.read_generic_channels()
             tab.plugins.initialize()
             tab.plugins.connect()
             dlg_wait.hide_dialog()

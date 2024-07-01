@@ -32,13 +32,13 @@ class PyConPlugins:
             for plugin in list_plugins:
                 plugin.initialize()
 
-    def read_plugin_channels(self):
+    def read_generic_channels(self):
         for _, plugin in self.std_plugins.__dict__.items():
-            plugin.read_plugin_channels()
+            plugin.read_generic_channels()
 
         for plugin_menu_group, list_plugins in self.detected_plugins.items():
             for plugin in list_plugins:
-                plugin.read_plugin_channels()
+                plugin.read_generic_channels()
 
     def connect(self):
         # ==================================================

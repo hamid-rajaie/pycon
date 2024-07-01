@@ -3,7 +3,7 @@ import re
 
 import numpy as np
 import yaml
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QStandardItemModel
 from PyQt5.QtWidgets import (
