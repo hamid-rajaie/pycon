@@ -9,7 +9,7 @@ class PyConPluginParams:
 
         self.pycon_data_source: PyConDataSource = pycon_data_source
 
-        self.alias_signal_dict = {}
+        # self.alias_signal_dict = {}
 
         self.initial_yaml_dir = ""
 

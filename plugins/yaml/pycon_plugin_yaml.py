@@ -18,6 +18,7 @@ from PyQt5.QtWidgets import (
 )
 
 from common.delegates.pycon_window_signal_explorer_delegate import PyConWindowSignalExplorerDelegate
+from common.generic_signals.pycon_generic_yaml import PyConGenericYaml
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
@@ -38,9 +39,7 @@ class PyConWindowPlugin_2(PyConPluginBase):
         self.pycon_data_source = params.pycon_data_source
         self.initial_yaml_dir = params.initial_yaml_dir
 
-        self.alias_signal_dict = params.alias_signal_dict
-        self.missing_needed_signals = []
-        self.missing_optional_signals = []
+        self.generic_yaml = PyConGenericYaml(pycon_data_source=params.pycon_data_source)
 
         self.setWindowTitle("Plugin yaml")
         #
@@ -155,11 +154,9 @@ class PyConWindowPlugin_2(PyConPluginBase):
 
             logger().info(selected_file_name)
 
-            with open(selected_file_name, "r") as file:
-                yaml_data_dict = yaml.safe_load(file)
+            self.generic_yaml.open_yaml_file(yaml_file=selected_file_name)
 
-                self.parse_yaml(yaml_data_dict=yaml_data_dict)
-                self.add_alias_signals()
+            self.add_alias_signals()
 
     def add_alias_signals(self):
 
@@ -175,7 +172,7 @@ class PyConWindowPlugin_2(PyConPluginBase):
         )
         self.root_node.appendRow(std_item_found_signals)
 
-        for alias, signal in self.alias_signal_dict.items():
+        for alias, signal in self.generic_yaml.alias_signal_dict.items():
 
             if self.search_text in alias:
 
@@ -200,19 +197,19 @@ class PyConWindowPlugin_2(PyConPluginBase):
                 std_item_parent.appendRows(channels)
                 std_item_found_signals.appendRow(std_item_parent)
 
-        self.add_section(sig_list=self.missing_needed_signals)
-        self.add_section(sig_list=self.missing_optional_signals)
+        self.add_section(text="missing needed signals", sig_list=self.generic_yaml.missing_needed_signals)
+        self.add_section(text="missing optional signals", sig_list=self.generic_yaml.missing_optional_signals)
 
         if self.search_text != "":
             self.signal_tree_view.expandAll()
 
-    def add_section(self, sig_list):
+    def add_section(self, text, sig_list):
 
         std_item_parent = PyConStandardItem(
             channel_group_index=-1,
             channel_group_comment=None,
             channel_index=-1,
-            text="missing needed signals",
+            text=text,
             font_size=12,
             set_bold=False,
         )
@@ -232,100 +229,6 @@ class PyConWindowPlugin_2(PyConPluginBase):
                 )
 
                 std_item_parent.appendRow(std_item)
-
-    def parse_yaml(self, yaml_data_dict: dict) -> tuple:
-
-        self.missing_needed_signals = []
-        self.missing_optional_signals = []
-
-        self.alias_signal_dict = {}
-
-        data_mf4 = self.pycon_data_source.data
-        iter_mf4 = data_mf4.channels_db.keys()
-        signals_mf4 = [channel.name for group in data_mf4.groups for channel in group.channels]
-
-        for alias, alias_desc in yaml_data_dict.items():
-
-            try:
-                alias_signals = alias_desc["signal"]
-
-                alias_optional = None
-                if "optional" in alias_desc.keys():
-                    alias_optional = alias_desc["signal"]
-
-                signal_available = False
-
-                if isinstance(alias_signals, list):
-
-                    for _, alias_signal in enumerate(alias_signals):
-                        if alias_signal in iter_mf4:
-                            if self.regex_indicator not in alias_signal:
-                                self.alias_signal_dict[alias] = alias_signal
-                                signal_available = True
-                                break
-                        else:
-                            if self.regex_indicator in alias_signal:
-                                regex_indices_alias = [i for i, c in enumerate(alias) if c == self.regex_indicator]
-                                regex_indices_signal = [
-                                    i for i, c in enumerate(alias_signal) if c == self.regex_indicator
-                                ]
-                                regex_pattern = re.escape(
-                                    alias_signal[: regex_indices_signal[0]]
-                                )  # add the initial part of the string
-                                for i, index in enumerate(regex_indices_signal):
-                                    if i == 0:
-                                        continue  # skip the first occurrence since it was already added
-                                    prev_index = regex_indices_signal[i - 1]
-                                    regex_pattern += r"(?P<index{}_>\d+)".format(i)  # add the named capturing group
-                                    regex_pattern += re.escape(
-                                        alias_signal[prev_index + 1 : index]
-                                    )  # add the text between the % and the next occurrence
-                                regex_pattern += r"(?P<index{}_>\d+)".format(
-                                    len(regex_indices_signal)
-                                )  # add the final named capturing group
-                                regex_pattern += re.escape(
-                                    alias_signal[regex_indices_signal[-1] + 1 :]
-                                )  # add the final part of the string
-
-                                # find all matches
-                                matches = re.findall(regex_pattern, str(signals_mf4))
-                                if matches:
-                                    for match in matches:
-                                        if not isinstance(match, tuple):
-                                            match = [match]
-                                        new_alias = alias
-                                        new_signal = alias_signal
-                                        for pos, index in enumerate(match):
-                                            new_alias = (
-                                                new_alias[: regex_indices_alias[pos]]
-                                                + index
-                                                + new_alias[regex_indices_alias[pos] + 1 :]
-                                            )
-                                            new_signal = (
-                                                new_signal[: regex_indices_signal[pos]]
-                                                + index
-                                                + new_signal[regex_indices_signal[pos] + 1 :]
-                                            )
-                                        # for videoLines we need to map the alias name back!
-                                        if "videoLines" in new_alias and "polynomialLine" not in new_alias:
-                                            # index:    11 12
-                                            # videoLines.X.
-                                            new_alias = (
-                                                new_alias[:11]
-                                                + self.VIDEO_LINES_MAPPING.get(match[0], f"UNKOWN-{new_alias[11]}")
-                                                + new_alias[12:]
-                                            )
-                                        self.alias_signal_dict[new_alias] = new_signal
-                                        signal_available = True
-
-                                if signal_available:
-                                    break
-                if not signal_available and alias_optional is not None:
-                    self.missing_optional_signals.append(alias)
-                if not signal_available and alias_optional is None:
-                    self.missing_needed_signals.append(alias)
-            except Exception as exp:
-                logger().warning(f"alias: {alias}  {str(exp)}")
 
     # ==========================================================================
     # search

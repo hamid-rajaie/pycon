@@ -53,26 +53,26 @@ class SignalGenerator:
         self.videoLines_left_dy = Signal(
             samples=np.sin(2 * np.pi * 2 * time),
             timestamps=time,
-            name="runnable_0.m_videoLines.videoLines.i0.dy",
+            name="runnable_2.m_videoLines.videoLines.i0.dy",
             unit="u1",
         )
         self.videoLines_right_dy = Signal(
             samples=np.sin(2 * np.pi * 2 * time),
             timestamps=time,
-            name="runnable_0.m_videoLines.videoLines.i1.dy",
+            name="runnable_2.m_videoLines.videoLines.i1.dy",
             unit="u1",
         )
 
         self.videoLines_left_curv = Signal(
             samples=np.sin(2 * np.pi * 2 * time),
             timestamps=time,
-            name="runnable_0.m_videoLines.videoLines.i0.curv",
+            name="runnable_2.m_videoLines.videoLines.i0.curv",
             unit="u1",
         )
         self.videoLines_right_curv = Signal(
             samples=np.sin(2 * np.pi * 2 * time),
             timestamps=time,
-            name="runnable_0.m_videoLines.videoLines.i1.curv",
+            name="runnable_2.m_videoLines.videoLines.i1.curv",
             unit="u1",
         )
         # ======================================================================
