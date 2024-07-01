@@ -6,7 +6,7 @@ class PyConStatus(Enum):
     NOT_OK = "not_ok"
 
 
-class PyConState:
+class PyConPluginState:
 
     def __init__(self) -> None:
         self.status: PyConStatus = PyConStatus.NOT_OK

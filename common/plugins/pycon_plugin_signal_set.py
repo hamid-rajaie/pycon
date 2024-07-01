@@ -1,4 +1,4 @@
-from common.plugins.pycon_state import PyConState
+from common.plugins.pycon_plugin_state import PyConPluginState
 
 
 class PyConSignal:
@@ -7,7 +7,7 @@ class PyConSignal:
         self.channel = None
 
 
-class PyConGenericSignalSet(PyConState):
+class PyConPluginSignalSet(PyConPluginState):
     def __init__(self) -> None:
         #
         # {

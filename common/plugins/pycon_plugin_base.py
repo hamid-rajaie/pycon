@@ -3,12 +3,11 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMdiSubWindow, QMenuBar, QVBoxLayout, QWidget
 
 from common.logging.logger import logger
-from common.plugins.pycon_generic_signal_set import PyConGenericSignalSet
-from common.plugins.pycon_state import PyConState
+from common.plugins.pycon_plugin_signal_set import PyConPluginSignalSet
 from plugins_std.pycon_time import PyConTime
 
 
-class PyConPluginBase(QMdiSubWindow, PyConGenericSignalSet):
+class PyConPluginBase(QMdiSubWindow, PyConPluginSignalSet):
 
     def __init__(self):
         super().__init__()
