@@ -1,6 +1,4 @@
-from PyQt5.Qt import QColor, QFont, QStandardItem
-
-from common.logging.logger import logger
+from PyQt5.QtGui import QColor, QFont, QStandardItem
 
 
 class PyConStandardItem(QStandardItem):

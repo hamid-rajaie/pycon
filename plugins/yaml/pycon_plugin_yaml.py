@@ -116,13 +116,17 @@ class PyConWindowPlugin_2(PyConPluginBase):
         # create tree view/model
         #
         self.signal_tree_view = QTreeView()
-        self.signal_tree_view.setHeaderHidden(True)
+        self.signal_tree_view.setHeaderHidden(False)
+        self.signal_tree_view.header().setStretchLastSection(False)
+        self.signal_tree_view.header().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
         self.signal_tree_model = QStandardItemModel()
         self.signal_tree_model.setHorizontalHeaderLabels([self.tr("Signal Name")])
         self.root_node = self.signal_tree_model.invisibleRootItem()
 
         self.signal_tree_view.setModel(self.signal_tree_model)
+        # self.signal_tree_view.resizeColumnToContents(0)
+
         #
         # create a layout, containing :
         #  1. the table widget
@@ -170,13 +174,14 @@ class PyConWindowPlugin_2(PyConPluginBase):
             font_size=12,
             set_bold=False,
         )
+        self.root_node.setColumnCount(2)
         self.root_node.appendRow(std_item_found_signals)
 
         for alias, signal in self.generic_yaml.alias_signal_dict.items():
 
-            if self.search_text in alias:
+            if self.search_text in alias or self.search_text in signal:
 
-                std_item_parent = PyConStandardItem(
+                std_item_alias = PyConStandardItem(
                     channel_group_index=-1,
                     channel_group_comment=None,
                     channel_index=-1,
@@ -184,7 +189,7 @@ class PyConWindowPlugin_2(PyConPluginBase):
                     font_size=12,
                     set_bold=False,
                 )
-                channels = []
+
                 std_item_signal = PyConStandardItem(
                     channel_group_index=-1,
                     channel_group_comment=None,
@@ -193,9 +198,8 @@ class PyConWindowPlugin_2(PyConPluginBase):
                     font_size=12,
                     set_bold=False,
                 )
-                channels.append(std_item_signal)
-                std_item_parent.appendRows(channels)
-                std_item_found_signals.appendRow(std_item_parent)
+
+                std_item_found_signals.appendRow((std_item_alias, std_item_signal))
 
         self.add_section(text="missing needed signals", sig_list=self.generic_yaml.missing_needed_signals)
         self.add_section(text="missing optional signals", sig_list=self.generic_yaml.missing_optional_signals)
@@ -205,7 +209,7 @@ class PyConWindowPlugin_2(PyConPluginBase):
 
     def add_section(self, text, sig_list):
 
-        std_item_parent = PyConStandardItem(
+        std_item_alias = PyConStandardItem(
             channel_group_index=-1,
             channel_group_comment=None,
             channel_index=-1,
@@ -213,7 +217,7 @@ class PyConWindowPlugin_2(PyConPluginBase):
             font_size=12,
             set_bold=False,
         )
-        self.root_node.appendRow(std_item_parent)
+        self.root_node.appendRow(std_item_alias)
 
         for signal in sig_list:
 
@@ -228,7 +232,7 @@ class PyConWindowPlugin_2(PyConPluginBase):
                     set_bold=False,
                 )
 
-                std_item_parent.appendRow(std_item)
+                std_item_alias.appendRow(std_item)
 
     # ==========================================================================
     # search
