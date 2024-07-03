@@ -1,8 +1,6 @@
 import os
-import re
 
 import numpy as np
-import yaml
 from PyQt5 import QtCore
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QStandardItemModel
@@ -22,7 +20,6 @@ from common.generic_signals.pycon_generic_yaml import PyConGenericYaml
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
-from data_sources.pycon_data_source import PyConDataSource
 from data_sources.pycon_standard_item import PyConStandardItem
 from pycon_config import get_pycon_config
 
@@ -36,19 +33,12 @@ class PyConWindowPlugin_2(PyConPluginBase):
     def __init__(self, params: PyConPluginParams):
         super().__init__()
 
-        self.pycon_data_source = params.pycon_data_source
         self.initial_yaml_dir = params.initial_yaml_dir
 
         self.generic_yaml = PyConGenericYaml(pycon_data_source=params.pycon_data_source)
 
         self.setWindowTitle("Plugin yaml")
-        #
-        # read csv
-        #
-        self.data_frame = None
 
-        self.table_widget = None
-        self.signal_tree_model = None
         self.signal_tree_view = None
         self.root_node = None
 
@@ -66,78 +56,59 @@ class PyConWindowPlugin_2(PyConPluginBase):
 
         self.__initUI()
 
-        self.regex_indicator = "%"
-
-        self.VIDEO_LINES_MAPPING = {
-            "0": "left",
-            "1": "right",
-            "2": "leftLeft",
-            "3": "rightRight",
-            "4": "roadEdgeLeft",
-            "5": "roadEdgeRight",
-            "6": "roadEdgeLeftRaised",
-            "7": "roadEdgeRightRaised",
-        }
-
     def __initUI(self):
         initial_row_count = 3
         initial_col_count = 2
         # ======================================================================
         # table widget
         # ======================================================================
-        self.table_widget = QTableWidget()
-        self.table_widget.setRowCount(initial_row_count)
-        self.table_widget.setColumnCount(initial_col_count)
+        table_widget = QTableWidget()
+        table_widget.setRowCount(initial_row_count)
+        table_widget.setColumnCount(initial_col_count)
 
-        header = self.table_widget.horizontalHeader()
+        header = table_widget.horizontalHeader()
 
-        self.table_widget.setHorizontalHeaderLabels(["Key", "Value"])
+        table_widget.setHorizontalHeaderLabels(["Key", "Value"])
 
-        # for idx in range(self.table_widget.rowCount()):
-        #    self.table_widget.setRowHeight(idx, row_height)
-        #    self.table_widget.setItemDelegateForRow(idx, self.delegate)
+        table_widget.setItem(0, 0, QTableWidgetItem("File Name"))
+        table_widget.setItem(0, 1, QTableWidgetItem("a full path here"))
 
-        self.table_widget.setItem(0, 0, QTableWidgetItem("File Name"))
-        self.table_widget.setItem(0, 1, QTableWidgetItem("a full path here"))
-
-        self.table_widget.setItem(1, 0, QTableWidgetItem("Search"))
-        self.table_widget.setItemDelegateForRow(1, self.delegate)
+        table_widget.setItem(1, 0, QTableWidgetItem("Search"))
+        table_widget.setItemDelegateForRow(1, self.delegate)
 
         open_btn = QPushButton("Open")
         open_btn.setCheckable(True)
         open_btn.clicked.connect(self.open_yaml_file)
 
-        self.table_widget.setCellWidget(2, 0, open_btn)
-        self.table_widget.setItem(2, 1, QTableWidgetItem("Open yaml file"))
+        table_widget.setCellWidget(2, 0, open_btn)
+        table_widget.setItem(2, 1, QTableWidgetItem("Open yaml file"))
 
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
-        #
+        # ======================================================================
         # create tree view/model
-        #
+        # ======================================================================
         self.signal_tree_view = QTreeView()
         self.signal_tree_view.setHeaderHidden(False)
         self.signal_tree_view.header().setStretchLastSection(False)
         self.signal_tree_view.header().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
-        self.signal_tree_model = QStandardItemModel()
-        self.signal_tree_model.setHorizontalHeaderLabels([self.tr("Signal Name")])
-        self.root_node = self.signal_tree_model.invisibleRootItem()
+        signal_tree_model = QStandardItemModel()
+        signal_tree_model.setHorizontalHeaderLabels([self.tr("Signal Name")])
+        self.root_node = signal_tree_model.invisibleRootItem()
 
-        self.signal_tree_view.setModel(self.signal_tree_model)
-        # self.signal_tree_view.resizeColumnToContents(0)
-
-        #
+        self.signal_tree_view.setModel(signal_tree_model)
+        # ======================================================================
         # create a layout, containing :
         #  1. the table widget
         #  2. the tree view
-        #
+        # ======================================================================
         _layout = QVBoxLayout()
-        _layout.addWidget(self.table_widget, 3)
+        _layout.addWidget(table_widget, 3)
         _layout.addWidget(self.signal_tree_view, 7)
-        #
-        # widget of self
-        #
+        # ======================================================================
+        # add widget
+        # ======================================================================
         _widget = QWidget()
         _widget.setLayout(_layout)
         self.setWidget(_widget)
@@ -155,8 +126,6 @@ class PyConWindowPlugin_2(PyConPluginBase):
             file_basename = os.path.basename(selected_file_name)
             self.open_dir = os.path.dirname(selected_file_name)
             file_basename_no_ext, file_basename_ext = os.path.splitext(file_basename)
-
-            logger().info(selected_file_name)
 
             self.generic_yaml.open_yaml_file(yaml_file=selected_file_name)
 
