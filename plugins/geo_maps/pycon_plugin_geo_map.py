@@ -72,7 +72,8 @@ class PyConPluginGeoMap(PyConPluginBase):
             self.__render_geo_map()
 
             self.signal_time_loaded.emit(
-                self.get_generic_channel("timestamp").samples[0], self.get_generic_channel("timestamp").samples[-1]
+                self.get_real_channel(generic_channel_name="timestamp").samples[0],
+                self.get_real_channel(generic_channel_name="timestamp").samples[-1],
             )
         except Exception as ex:
             logger().warning(str(ex))
@@ -99,10 +100,10 @@ class PyConPluginGeoMap(PyConPluginBase):
 
         time_sec = time.get_time_sec()
 
-        idx, t = find_nearest_time(arr=self.get_generic_channel("timestamp").samples, value=time_sec)
+        idx, t = find_nearest_time(arr=self.get_real_channel(generic_channel_name="timestamp").samples, value=time_sec)
 
-        lon_wgs84 = self.get_generic_channel("lon_wgs84").samples[idx]
-        lat_wgs84 = self.get_generic_channel("lat_wgs84").samples[idx]
+        lon_wgs84 = self.get_real_channel(generic_channel_name="lon_wgs84").samples[idx]
+        lat_wgs84 = self.get_real_channel(generic_channel_name="lat_wgs84").samples[idx]
 
         self.__add_marker(latitude=lat_wgs84, longitude=lon_wgs84)
 
