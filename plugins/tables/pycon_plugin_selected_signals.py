@@ -47,7 +47,7 @@ class PyConWindowSelectedSignals(PyConPluginBase):
 
         self.signal_tree_view.setModel(self.signal_tree_model)
 
-        super().initUI(widget=self.signal_tree_view, opt_menubar=False)
+        super().initUI(widget=self.signal_tree_view, with_menubar=False)
 
     # ==========================================================================
     # context menu

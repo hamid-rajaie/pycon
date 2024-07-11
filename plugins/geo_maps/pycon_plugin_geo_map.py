@@ -6,7 +6,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import QObject, pyqtSlot
 from PyQt5.QtWebChannel import QWebChannel
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtWidgets import QAction, QMenu, QMenuBar, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QAction, QMenu
 
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
@@ -50,7 +50,6 @@ class PyConPluginGeoMap(PyConPluginBase):
         self.add_generic_channel(generic_signal="lat_wgs84")
 
         self.pycon_canvas = None
-
         self.geo_map = None
 
         self.__initUI()
@@ -59,7 +58,7 @@ class PyConPluginGeoMap(PyConPluginBase):
         self.geo_map_view = QWebEngineView()
         self.geo_map_view.page().setWebChannel(self.channel)
 
-        super().initUI(widget=self.geo_map_view, opt_menubar=True)
+        super().initUI(widget=self.geo_map_view, with_menubar=True)
 
         menu_needed_signals = QMenu("&Needed Signals", self)
         self.menubar().addMenu(menu_needed_signals)

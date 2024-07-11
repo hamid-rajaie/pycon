@@ -6,7 +6,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QAction, QGridLayout, QMenu, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QAction, QGridLayout, QMenu, QWidget
 
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
@@ -28,11 +28,8 @@ class PyConWindowTopView(PyConPluginBase):
         self.pycon_data_source = params.pycon_data_source
 
         self.plugins = None
-
-        self.widget_1 = None
-        self.widget_2 = None
-
         self.lines_2d = []
+        self.widget_1_layout = None
 
         self.__initUI()
 
@@ -49,15 +46,15 @@ class PyConWindowTopView(PyConPluginBase):
         self.__create_top_view()
 
     def __initUI(self):
-        self.widget_1 = QWidget()
-        self.widget_1_layout = QGridLayout(self.widget_1)
+        widget = QWidget()
+        self.widget_1_layout = QGridLayout(widget)
 
-        pal_1 = self.widget_1.palette()
-        self.widget_1.setAutoFillBackground(True)
-        pal_1.setColor(self.widget_1.backgroundRole(), Qt.white)
-        self.widget_1.setPalette(pal_1)
+        pal = widget.palette()
+        widget.setAutoFillBackground(True)
+        pal.setColor(widget.backgroundRole(), Qt.white)
+        widget.setPalette(pal)
 
-        super().initUI(widget=self.widget_1, opt_menubar=True)
+        super().initUI(widget=widget, with_menubar=True)
 
         menu_needed_signals = QMenu("&Needed Signals", self)
         self.menubar().addMenu(menu_needed_signals)

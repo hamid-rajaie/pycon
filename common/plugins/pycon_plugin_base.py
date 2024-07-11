@@ -16,14 +16,14 @@ class PyConPluginBase(QMdiSubWindow, PyConPluginSignalSet):
 
         self.settings = {}
 
-    def initUI(self, widget: QWidget, opt_menubar: bool = False):
+    def initUI(self, widget: QWidget, with_menubar: bool):
         self.__layout = QVBoxLayout()
         self.__layout.addWidget(widget)
         self.__widget = QWidget()
         self.__widget.setLayout(self.__layout)
         self.setWidget(self.__widget)
 
-        if opt_menubar:
+        if with_menubar:
             self.__menu_bar = QMenuBar()
             self.__layout.setMenuBar(self.__menu_bar)
 
