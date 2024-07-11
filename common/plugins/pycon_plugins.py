@@ -24,13 +24,13 @@ class PyConPlugins:
         self.__create_std_plugin()
         self.__discover_plugins()
 
-    def initialize(self):
+    def initPlugins(self):
         for _, plugin in self.std_plugins.__dict__.items():
-            plugin.initialize()
+            plugin.initPlugin()
 
         for plugin_menu_group, list_plugins in self.detected_plugins.items():
             for plugin in list_plugins:
-                plugin.initialize()
+                plugin.initPlugin()
 
     def read_generic_channels(self):
         for _, plugin in self.std_plugins.__dict__.items():

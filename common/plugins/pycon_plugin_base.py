@@ -30,7 +30,7 @@ class PyConPluginBase(QMdiSubWindow, PyConPluginSignalSet):
     def menubar(self):
         return self.__menu_bar
 
-    def initialize(self):
+    def initPlugin(self):
         pass
 
     def get_settings(self):

@@ -91,9 +91,9 @@ class PyConWindowTopView(PyConPluginBase):
 
         return plugins
 
-    def initialize(self):
+    def initPlugin(self):
         for plugin in self.plugins:
-            plugin.initialize()
+            plugin.initPlugin()
 
     def __create_top_view(self):
         # https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html

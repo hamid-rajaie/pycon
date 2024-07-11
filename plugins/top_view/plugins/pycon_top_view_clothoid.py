@@ -91,7 +91,7 @@ class PyConTopViewClothoid(PyConTopViewPluginBase):
             ),
         ]
 
-    def initialize(self):
+    def initPlugin(self):
         try:
             self.time = self.pycon_data_source.get_channel(channel_name="timestamp")
 

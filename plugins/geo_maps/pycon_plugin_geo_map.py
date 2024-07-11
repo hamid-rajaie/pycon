@@ -67,7 +67,7 @@ class PyConPluginGeoMap(PyConPluginBase):
             action_signal = QAction(signal, self)
             menu_needed_signals.addAction(action_signal)
 
-    def initialize(self):
+    def initPlugin(self):
         try:
             self.__render_geo_map()
 
