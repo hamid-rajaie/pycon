@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+import yaml
 from PyQt5 import QtCore
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QStandardItemModel
@@ -19,7 +20,6 @@ from common.delegates.pycon_window_signal_explorer_delegate import PyConWindowSi
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
-from data_sources.pycon_generic_yaml import PyConGenericYaml
 from data_sources.pycon_standard_item import PyConStandardItem
 from pycon_config import get_pycon_config
 
@@ -35,7 +35,7 @@ class PyConWindowPlugin_2(PyConPluginBase):
 
         self.initial_yaml_dir = params.initial_yaml_dir
 
-        self.generic_yaml = PyConGenericYaml(pycon_data_source=params.pycon_data_source)
+        self.pycon_data_source = params.pycon_data_source
 
         self.setWindowTitle("Plugin yaml")
 
@@ -127,9 +127,10 @@ class PyConWindowPlugin_2(PyConPluginBase):
             self.open_dir = os.path.dirname(selected_file_name)
             file_basename_no_ext, file_basename_ext = os.path.splitext(file_basename)
 
-            self.generic_yaml.open_yaml_file(yaml_file=selected_file_name)
-
-            self.add_alias_signals()
+            with open(selected_file_name, "r") as file:
+                yaml_data_dict = yaml.safe_load(file)
+                self.pycon_data_source.parse_generic_real_info(yaml_data_dict=yaml_data_dict)
+                self.add_alias_signals()
 
     def add_alias_signals(self):
 
@@ -146,7 +147,7 @@ class PyConWindowPlugin_2(PyConPluginBase):
         self.root_node.setColumnCount(2)
         self.root_node.appendRow(std_item_found_signals)
 
-        for alias, signal in self.generic_yaml.generic_to_real_map.items():
+        for alias, signal in self.pycon_data_source.generic_to_real_map.items():
 
             if self.search_text in alias or self.search_text in signal:
 
@@ -171,10 +172,11 @@ class PyConWindowPlugin_2(PyConPluginBase):
                 std_item_found_signals.appendRow((std_item_alias, std_item_signal))
 
         self.add_section(
-            text="missing needed generic signals", sig_list=self.generic_yaml.missing_needed_generic_signals_names
+            text="missing needed generic signals", sig_list=self.pycon_data_source.needed_generic_signals()
         )
         self.add_section(
-            text="missing optional generic signals", sig_list=self.generic_yaml.missing_optional_generic_signals_names
+            text="missing optional generic signals",
+            sig_list=self.pycon_data_source.optional_generic_signals(),
         )
 
         if self.search_text != "":
