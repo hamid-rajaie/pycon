@@ -24,11 +24,6 @@ class PyConDataSourceBase:
             "7": "roadEdgeRightRaised",
         }
 
-    def reset_generic_real_data(self):
-        self.generic_to_real_map: dict = {}
-        self.missing_needed_generic_signals_names: list = []
-        self.missing_optional_generic_signals_names: list = []
-
     def add_to_map(self, generic, real):
         self.generic_to_real_map[generic] = real
 
@@ -53,9 +48,11 @@ class PyConDataSourceBase:
     def get_channels_names(self):
         return Exception("get_channels is not implemented")
 
-    def parse_generic_real_info(self, yaml_data_dict: dict) -> tuple:
+    def setup_generic_real_map(self, yaml_data_dict: dict) -> tuple:
 
-        self.reset_generic_real_data()
+        self.generic_to_real_map: dict = {}
+        self.missing_needed_generic_signals_names: list = []
+        self.missing_optional_generic_signals_names: list = []
 
         data_source_signal_names = self.get_channels_names()
 

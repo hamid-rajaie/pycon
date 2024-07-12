@@ -117,7 +117,7 @@ class PyConMainWindow(QMainWindow):
             # create data source
             # ==================================================
             dlg_wait = PyConDialogWait(self, "Loading File")
-            if file_basename_ext == ".csv":
+            if file_basename_ext in [".csv"]:
                 pycon_data_source = PyConDataSourceCsv(file_name=selected_file_name)
 
             if file_basename_ext in [".mf4", ".MF4"]:

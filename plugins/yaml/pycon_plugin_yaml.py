@@ -20,6 +20,7 @@ from common.delegates.pycon_window_signal_explorer_delegate import PyConWindowSi
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
+from container.pycon_dialog_wait import PyConDialogWait
 from data_sources.pycon_standard_item import PyConStandardItem
 from pycon_config import get_pycon_config
 
@@ -129,7 +130,9 @@ class PyConWindowPlugin_2(PyConPluginBase):
 
             with open(selected_file_name, "r") as file:
                 yaml_data_dict = yaml.safe_load(file)
-                self.pycon_data_source.parse_generic_real_info(yaml_data_dict=yaml_data_dict)
+                dlg_wait = PyConDialogWait(self, "Parsing yaml")
+                self.pycon_data_source.setup_generic_real_map(yaml_data_dict=yaml_data_dict)
+                dlg_wait.hide_dialog()
                 self.add_alias_signals()
 
     def add_alias_signals(self):

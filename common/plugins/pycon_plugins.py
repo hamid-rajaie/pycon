@@ -5,7 +5,7 @@ from PyQt5.QtCore import QSettings
 
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
-from common.pycon_std_plugins import PyConStdPlugins
+from common.plugins.pycon_std_plugins import PyConStdPlugins
 from plugins_std.pycon_plugin_control_panel import PyConPluginControlPanel
 from plugins_std.pycon_plugin_signal_explorer import PyConPluginSignalExplorer
 from pycon_config import get_pycon_config
