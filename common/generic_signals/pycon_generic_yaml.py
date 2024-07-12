@@ -15,9 +15,9 @@ class PyConGenericYaml:
 
         self.pycon_data_source = pycon_data_source
 
-        self.alias_signal_dict: dict = {}
-        self.missing_needed_signals: list = []
-        self.missing_optional_signals: list = []
+        self.generic_to_real_map: dict = {}
+        self.missing_needed_generic_signals_names: list = []
+        self.missing_optional_generic_signals_names: list = []
 
         self.regex_indicator = "%"
 
@@ -40,9 +40,9 @@ class PyConGenericYaml:
 
     def parse_yaml(self, yaml_data_dict: dict) -> tuple:
 
-        self.alias_signal_dict = {}
-        self.missing_needed_signals = []
-        self.missing_optional_signals = []
+        self.generic_to_real_map = {}
+        self.missing_needed_generic_signals_names = []
+        self.missing_optional_generic_signals_names = []
 
         data_source_signal_names = self.pycon_data_source.get_channels_names()
 
@@ -62,7 +62,7 @@ class PyConGenericYaml:
                     for _, real_signal in enumerate(real_signals):
                         if real_signal in data_source_signal_names:
                             if self.regex_indicator not in real_signal:
-                                self.alias_signal_dict[generic_signal_name] = real_signal
+                                self.generic_to_real_map[generic_signal_name] = real_signal
                                 signal_available = True
                                 break
                         else:
@@ -97,13 +97,13 @@ class PyConGenericYaml:
                                     for match in matches:
                                         if not isinstance(match, tuple):
                                             match = [match]
-                                        new_alias = generic_signal_name
+                                        new_generic_signal_name = generic_signal_name
                                         new_signal = real_signal
                                         for pos, index in enumerate(match):
-                                            new_alias = (
-                                                new_alias[: regex_indices_alias[pos]]
+                                            new_generic_signal_name = (
+                                                new_generic_signal_name[: regex_indices_alias[pos]]
                                                 + index
-                                                + new_alias[regex_indices_alias[pos] + 1 :]
+                                                + new_generic_signal_name[regex_indices_alias[pos] + 1 :]
                                             )
                                             new_signal = (
                                                 new_signal[: regex_indices_signal[pos]]
@@ -111,47 +111,27 @@ class PyConGenericYaml:
                                                 + new_signal[regex_indices_signal[pos] + 1 :]
                                             )
                                         # for videoLines we need to map the generic_signal_name name back!
-                                        if "videoLines" in new_alias and "polynomialLine" not in new_alias:
+                                        if (
+                                            "videoLines" in new_generic_signal_name
+                                            and "polynomialLine" not in new_generic_signal_name
+                                        ):
                                             # index:    11 12
                                             # videoLines.X.
-                                            new_alias = (
-                                                new_alias[:11]
-                                                + self.VIDEO_LINES_MAPPING.get(match[0], f"UNKOWN-{new_alias[11]}")
-                                                + new_alias[12:]
+                                            new_generic_signal_name = (
+                                                new_generic_signal_name[:11]
+                                                + self.VIDEO_LINES_MAPPING.get(
+                                                    match[0], f"UNKOWN-{new_generic_signal_name[11]}"
+                                                )
+                                                + new_generic_signal_name[12:]
                                             )
-                                        self.alias_signal_dict[new_alias] = new_signal
+                                        self.generic_to_real_map[new_generic_signal_name] = new_signal
                                         signal_available = True
 
                                 if signal_available:
                                     break
                 if not signal_available and real_optional is not None:
-                    self.missing_optional_signals.append(generic_signal_name)
+                    self.missing_optional_generic_signals_names.append(generic_signal_name)
                 if not signal_available and real_optional is None:
-                    self.missing_needed_signals.append(generic_signal_name)
+                    self.missing_needed_generic_signals_names.append(generic_signal_name)
             except Exception as exp:
                 logger().warning(f"generic_signal_name: {generic_signal_name}  {str(exp)}")
-
-    # ==========================================================================
-    # search
-    # ==========================================================================
-    def slot_timer_timeout(self):
-        logger().info("timeout ... render result")
-        self.timer.stop()
-        self.timer_started = False
-
-        self.add_alias_signals()
-
-    def slot_search(self, search_text):
-        logger().info(f"{search_text} ... {self.search_cnt}")
-
-        self.search_text = search_text
-        self.search_cnt = self.search_cnt + 1
-
-        if not self.timer_started:
-            self.timer.start(self.search_time_out)
-            self.timer_started = True
-        else:
-            self.timer.stop()
-            self.timer.start(self.search_time_out)
-            self.timer_started = True
-        return

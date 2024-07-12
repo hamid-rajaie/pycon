@@ -146,7 +146,7 @@ class PyConWindowPlugin_2(PyConPluginBase):
         self.root_node.setColumnCount(2)
         self.root_node.appendRow(std_item_found_signals)
 
-        for alias, signal in self.generic_yaml.alias_signal_dict.items():
+        for alias, signal in self.generic_yaml.generic_to_real_map.items():
 
             if self.search_text in alias or self.search_text in signal:
 
@@ -170,8 +170,12 @@ class PyConWindowPlugin_2(PyConPluginBase):
 
                 std_item_found_signals.appendRow((std_item_alias, std_item_signal))
 
-        self.add_section(text="missing needed signals", sig_list=self.generic_yaml.missing_needed_signals)
-        self.add_section(text="missing optional signals", sig_list=self.generic_yaml.missing_optional_signals)
+        self.add_section(
+            text="missing needed generic signals", sig_list=self.generic_yaml.missing_needed_generic_signals_names
+        )
+        self.add_section(
+            text="missing optional generic signals", sig_list=self.generic_yaml.missing_optional_generic_signals_names
+        )
 
         if self.search_text != "":
             self.signal_tree_view.expandAll()
