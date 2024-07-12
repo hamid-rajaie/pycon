@@ -16,10 +16,10 @@ from PyQt5.QtWidgets import (
 )
 
 from common.delegates.pycon_window_signal_explorer_delegate import PyConWindowSignalExplorerDelegate
-from common.generic_signals.pycon_generic_yaml import PyConGenericYaml
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
+from data_sources.pycon_generic_yaml import PyConGenericYaml
 from data_sources.pycon_standard_item import PyConStandardItem
 from pycon_config import get_pycon_config
 
