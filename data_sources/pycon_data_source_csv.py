@@ -1,6 +1,6 @@
 import pandas as pd
 
-from data_sources.pycon_data_source import PyConDataSource
+from data_sources.pycon_data_source_base import PyConDataSourceBase
 from data_sources.pycon_data_source_interface import (
     PyConDataSourceChannel,
     PyConDataSourceChannelGroup,
@@ -10,7 +10,7 @@ from data_sources.pycon_data_source_interface import (
 )
 
 
-class PyConDataSourceCsv(PyConDataSource):
+class PyConDataSourceCsv(PyConDataSourceBase):
     def __init__(self, file_name: str):
         super().__init__()
 

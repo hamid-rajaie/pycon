@@ -8,7 +8,7 @@ from common.delegates.pycon_window_signal_explorer_delegate import PyConWindowSi
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from container.pycon_dialog_wait import PyConDialogWait
-from data_sources.pycon_data_source import PyConDataSource
+from data_sources.pycon_data_source_base import PyConDataSourceBase
 from data_sources.pycon_standard_item import PyConStandardItem
 from pycon_config import get_pycon_config
 
@@ -19,7 +19,7 @@ class PyConPluginSignalExplorer(PyConPluginBase):
     # ==================================================
     signal_explorer_double_click = QtCore.pyqtSignal(int, int, str, np.ndarray, np.ndarray)
 
-    def __init__(self, pycon_data_source: PyConDataSource):
+    def __init__(self, pycon_data_source: PyConDataSourceBase):
         super().__init__()
 
         self.pycon_data_source = pycon_data_source

@@ -8,7 +8,7 @@ from common.delegates.pycon_window_signal_explorer_delegate import PyConWindowSi
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
-from data_sources.pycon_data_source import PyConDataSource
+from data_sources.pycon_data_source_base import PyConDataSourceBase
 from data_sources.pycon_standard_item import PyConStandardItem
 
 

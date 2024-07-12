@@ -3,10 +3,10 @@ import time
 from asammdf import MDF
 
 from common.logging.logger import logger
-from data_sources.pycon_data_source import PyConDataSource
+from data_sources.pycon_data_source_base import PyConDataSourceBase
 
 
-class PyConDataSourceMdf(PyConDataSource):
+class PyConDataSourceMdf(PyConDataSourceBase):
     def __init__(self, file_name: str):
         super().__init__()
 

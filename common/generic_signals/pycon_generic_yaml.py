@@ -5,13 +5,13 @@ import numpy as np
 import yaml
 
 from common.logging.logger import logger
-from data_sources.pycon_data_source import PyConDataSource
+from data_sources.pycon_data_source_base import PyConDataSourceBase
 from pycon_config import get_pycon_config
 
 
 class PyConGenericYaml:
 
-    def __init__(self, pycon_data_source: PyConDataSource):
+    def __init__(self, pycon_data_source: PyConDataSourceBase):
 
         self.pycon_data_source = pycon_data_source
 

@@ -1,13 +1,13 @@
 import os
 
-from data_sources.pycon_data_source import PyConDataSource
+from data_sources.pycon_data_source_base import PyConDataSourceBase
 
 
 class PyConPluginParams:
 
-    def __init__(self, selected_file_name: str, pycon_data_source: PyConDataSource, initial_yaml_dir: str) -> None:
+    def __init__(self, selected_file_name: str, pycon_data_source: PyConDataSourceBase, initial_yaml_dir: str) -> None:
 
-        self.pycon_data_source: PyConDataSource = pycon_data_source
+        self.pycon_data_source: PyConDataSourceBase = pycon_data_source
 
         # self.alias_signal_dict = {}
 
