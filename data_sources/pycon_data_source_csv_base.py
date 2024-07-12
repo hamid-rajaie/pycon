@@ -1,4 +1,7 @@
+import pandas as pd
+
 from common.logging.logger import logger
+from data_sources.pycon_data_source_base import PyConDataSourceBase
 
 
 class PyConDataSourceChannelSignal:
@@ -52,3 +55,24 @@ class PyConDataSourceGroups:
                 raise Exception(
                     f"Multiple occurrences for channel :{channel_name} found, Provide both group and index arguments to select another data group"
                 )
+
+
+class PyConDataSourceCsvBase(PyConDataSourceBase):
+
+    def __init__(self) -> None:
+        self.data = PyConDataSourceGroups()
+
+    def set_data(self, data_frame: pd.DataFrame):
+        channel_group = PyConDataSourceChannelGroup(comment="main group")
+
+        group = PyConDataSourceGroup(channel_group=channel_group)
+
+        for col in data_frame.columns:
+            samples = data_frame[col].to_numpy()
+            signal = PyConDataSourceChannelSignal(samples=samples)
+            channel = PyConDataSourceChannel(name=col, signal=signal)
+
+            group.channels.append(channel)
+
+        # self.data = PyConDataSourceGroups()
+        self.data.groups.append(group)

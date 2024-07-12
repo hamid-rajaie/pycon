@@ -1,39 +1,18 @@
 import pandas as pd
 
-from data_sources.pycon_data_source_base import PyConDataSourceBase
-from data_sources.pycon_data_source_interface import (
-    PyConDataSourceChannel,
-    PyConDataSourceChannelGroup,
-    PyConDataSourceChannelSignal,
-    PyConDataSourceGroup,
-    PyConDataSourceGroups,
-)
+from data_sources.pycon_data_source_csv_base import PyConDataSourceCsvBase
 
 
-class PyConDataSourceCsv(PyConDataSourceBase):
+class PyConDataSourceCsv(PyConDataSourceCsvBase):
     def __init__(self, file_name: str):
         super().__init__()
 
         self.file_name = file_name
-        self.data_frame = None
         self.__read_data()
 
     def __read_data(self):
-        self.data_frame = pd.read_csv(self.file_name, index_col=None)
-
-        channel_group = PyConDataSourceChannelGroup(comment="main group")
-
-        group = PyConDataSourceGroup(channel_group=channel_group)
-
-        for col in self.data_frame.columns:
-            samples = self.data_frame[col].to_numpy()
-            signal = PyConDataSourceChannelSignal(samples=samples)
-            channel = PyConDataSourceChannel(name=col, signal=signal)
-
-            group.channels.append(channel)
-
-        self.data = PyConDataSourceGroups()
-        self.data.groups.append(group)
+        data_frame = pd.read_csv(self.file_name, index_col=None)
+        self.set_data(data_frame=data_frame)
 
     def get_groups(self):
         return self.data.groups
