@@ -40,42 +40,43 @@ class PyConGenericYaml:
 
     def parse_yaml(self, yaml_data_dict: dict) -> tuple:
 
+        self.alias_signal_dict = {}
         self.missing_needed_signals = []
         self.missing_optional_signals = []
-
-        self.alias_signal_dict = {}
 
         data_mf4 = self.pycon_data_source.data
         iter_mf4 = data_mf4.channels_db.keys()
         signals_mf4 = [channel.name for group in data_mf4.groups for channel in group.channels]
 
-        for alias, alias_desc in yaml_data_dict.items():
+        for generic_signal_name, real_signal_description in yaml_data_dict.items():
 
             try:
-                alias_signals = alias_desc["signal"]
+                real_signals = real_signal_description["signal"]
 
-                alias_optional = None
-                if "optional" in alias_desc.keys():
-                    alias_optional = alias_desc["signal"]
+                real_optional = None
+                if "optional" in real_signal_description.keys():
+                    real_optional = real_signal_description["signal"]
 
                 signal_available = False
 
-                if isinstance(alias_signals, list):
+                if isinstance(real_signals, list):
 
-                    for _, alias_signal in enumerate(alias_signals):
-                        if alias_signal in iter_mf4:
-                            if self.regex_indicator not in alias_signal:
-                                self.alias_signal_dict[alias] = alias_signal
+                    for _, real_signal in enumerate(real_signals):
+                        if real_signal in iter_mf4:
+                            if self.regex_indicator not in real_signal:
+                                self.alias_signal_dict[generic_signal_name] = real_signal
                                 signal_available = True
                                 break
                         else:
-                            if self.regex_indicator in alias_signal:
-                                regex_indices_alias = [i for i, c in enumerate(alias) if c == self.regex_indicator]
+                            if self.regex_indicator in real_signal:
+                                regex_indices_alias = [
+                                    i for i, c in enumerate(generic_signal_name) if c == self.regex_indicator
+                                ]
                                 regex_indices_signal = [
-                                    i for i, c in enumerate(alias_signal) if c == self.regex_indicator
+                                    i for i, c in enumerate(real_signal) if c == self.regex_indicator
                                 ]
                                 regex_pattern = re.escape(
-                                    alias_signal[: regex_indices_signal[0]]
+                                    real_signal[: regex_indices_signal[0]]
                                 )  # add the initial part of the string
                                 for i, index in enumerate(regex_indices_signal):
                                     if i == 0:
@@ -83,13 +84,13 @@ class PyConGenericYaml:
                                     prev_index = regex_indices_signal[i - 1]
                                     regex_pattern += r"(?P<index{}_>\d+)".format(i)  # add the named capturing group
                                     regex_pattern += re.escape(
-                                        alias_signal[prev_index + 1 : index]
+                                        real_signal[prev_index + 1 : index]
                                     )  # add the text between the % and the next occurrence
                                 regex_pattern += r"(?P<index{}_>\d+)".format(
                                     len(regex_indices_signal)
                                 )  # add the final named capturing group
                                 regex_pattern += re.escape(
-                                    alias_signal[regex_indices_signal[-1] + 1 :]
+                                    real_signal[regex_indices_signal[-1] + 1 :]
                                 )  # add the final part of the string
 
                                 # find all matches
@@ -98,8 +99,8 @@ class PyConGenericYaml:
                                     for match in matches:
                                         if not isinstance(match, tuple):
                                             match = [match]
-                                        new_alias = alias
-                                        new_signal = alias_signal
+                                        new_alias = generic_signal_name
+                                        new_signal = real_signal
                                         for pos, index in enumerate(match):
                                             new_alias = (
                                                 new_alias[: regex_indices_alias[pos]]
@@ -111,7 +112,7 @@ class PyConGenericYaml:
                                                 + index
                                                 + new_signal[regex_indices_signal[pos] + 1 :]
                                             )
-                                        # for videoLines we need to map the alias name back!
+                                        # for videoLines we need to map the generic_signal_name name back!
                                         if "videoLines" in new_alias and "polynomialLine" not in new_alias:
                                             # index:    11 12
                                             # videoLines.X.
@@ -125,12 +126,12 @@ class PyConGenericYaml:
 
                                 if signal_available:
                                     break
-                if not signal_available and alias_optional is not None:
-                    self.missing_optional_signals.append(alias)
-                if not signal_available and alias_optional is None:
-                    self.missing_needed_signals.append(alias)
+                if not signal_available and real_optional is not None:
+                    self.missing_optional_signals.append(generic_signal_name)
+                if not signal_available and real_optional is None:
+                    self.missing_needed_signals.append(generic_signal_name)
             except Exception as exp:
-                logger().warning(f"alias: {alias}  {str(exp)}")
+                logger().warning(f"generic_signal_name: {generic_signal_name}  {str(exp)}")
 
     # ==========================================================================
     # search
