@@ -21,3 +21,6 @@ class PyConDataSourceCsv(PyConDataSourceCsvBase):
         return self.data.get_the_channel(
             channel_name=channel_name, group_index=group_index, channel_index=channel_index
         )
+
+    def get_channels(self):
+        pass

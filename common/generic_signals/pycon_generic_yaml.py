@@ -44,9 +44,7 @@ class PyConGenericYaml:
         self.missing_needed_signals = []
         self.missing_optional_signals = []
 
-        data_mf4 = self.pycon_data_source.data
-        iter_mf4 = data_mf4.channels_db.keys()
-        signals_mf4 = [channel.name for group in data_mf4.groups for channel in group.channels]
+        data_source_signal_names = self.pycon_data_source.get_channels_names()
 
         for generic_signal_name, real_signal_description in yaml_data_dict.items():
 
@@ -62,7 +60,7 @@ class PyConGenericYaml:
                 if isinstance(real_signals, list):
 
                     for _, real_signal in enumerate(real_signals):
-                        if real_signal in iter_mf4:
+                        if real_signal in data_source_signal_names:
                             if self.regex_indicator not in real_signal:
                                 self.alias_signal_dict[generic_signal_name] = real_signal
                                 signal_available = True
@@ -94,7 +92,7 @@ class PyConGenericYaml:
                                 )  # add the final part of the string
 
                                 # find all matches
-                                matches = re.findall(regex_pattern, str(signals_mf4))
+                                matches = re.findall(regex_pattern, str(data_source_signal_names))
                                 if matches:
                                     for match in matches:
                                         if not isinstance(match, tuple):

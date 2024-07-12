@@ -7,3 +7,6 @@ class PyConDataSourceBase:
 
     def get_channel(self, channel_name: str, group_index: int = None, channel_index: int = None):
         return Exception("get_channel is not implemented")
+
+    def get_channels(self):
+        return Exception("get_channels is not implemented")
