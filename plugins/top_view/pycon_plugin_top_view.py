@@ -56,13 +56,6 @@ class PyConWindowTopView(PyConPluginBase):
 
         super().initUI(widget=widget, with_menubar=True)
 
-        menu_needed_signals = QMenu("&Needed Signals", self)
-        self.menubar().addMenu(menu_needed_signals)
-
-        for signal in self.get_generic_names():
-            action_signal = QAction(signal, self)
-            menu_needed_signals.addAction(action_signal)
-
     def get_settings(self):
         for plugin in self.plugins:
             self.settings[plugin.name] = {}
