@@ -151,12 +151,23 @@ class PyConMainWindow(QMainWindow):
                 menu_grp = QMenu("&Standard", self)
                 self.menu_plugins.addMenu(menu_grp)
 
+                def lambda_generator(plugin):
+                    return lambda: plugin.show()
+
+                for plugin in [
+                    tab.plugins.std_plugins.plugin_control_panel,
+                    tab.plugins.std_plugins.plugin_signal_explorer,
+                ]:
+                    action = QAction(plugin.windowTitle(), self)
+                    action.triggered.connect(lambda_generator(plugin))
+                    menu_grp.addAction(action)
+
                 for plugin_menu_group, list_plugins in tab.plugins.detected_plugins.items():
                     menu_grp = QMenu(plugin_menu_group, self)
                     self.menu_plugins.addMenu(menu_grp)
 
-                    def lambda_generator(plugin):
-                        return lambda: plugin.show()
+                    # def lambda_generator(plugin):
+                    #    return lambda: plugin.show()
 
                     for plugin in list_plugins:
                         action = QAction(plugin.windowTitle(), self)
