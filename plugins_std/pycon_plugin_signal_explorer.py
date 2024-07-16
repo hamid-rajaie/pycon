@@ -34,11 +34,11 @@ class PyConPluginSignalExplorer(PyConPluginBase):
     # ==================================================
     signal_explorer_double_click = QtCore.pyqtSignal(int, int, str, np.ndarray, np.ndarray)
 
-    def __init__(self, plugin_params: PyConPluginParams):
+    def __init__(self, params: PyConPluginParams):
         super().__init__()
 
-        self.pycon_data_source = plugin_params.pycon_data_source
-        self.initial_yaml_dir = plugin_params.initial_yaml_dir
+        self.pycon_data_source = params.pycon_data_source
+        self.initial_yaml_dir = params.initial_yaml_dir
 
         self.setWindowTitle("Signal Explorer")
         #

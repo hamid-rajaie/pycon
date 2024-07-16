@@ -92,7 +92,7 @@ class PyConPlugins:
 
     def __create_std_plugin(self):
         self.std_plugins.plugin_control_panel = PyConPluginControlPanel()
-        self.std_plugins.plugin_signal_explorer = PyConPluginSignalExplorer(plugin_params=self.plugin_params)
+        self.std_plugins.plugin_signal_explorer = PyConPluginSignalExplorer(params=self.plugin_params)
 
     def __discover_plugins(self):
 
