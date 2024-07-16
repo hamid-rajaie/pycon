@@ -40,11 +40,6 @@ class PyConConfig:
                 "plugin_menu_group": "Templates",
             },
             {
-                "plugin_package": "plugins.yaml",
-                "plugin_dir": "C:\\develop\\pycon\\plugins\\yaml",
-                "plugin_menu_group": "Yaml",
-            },
-            {
                 "plugin_package": "plugins.videos",
                 "plugin_dir": "C:\\develop\\pycon\\plugins\\videos",
                 "plugin_menu_group": "Videos",

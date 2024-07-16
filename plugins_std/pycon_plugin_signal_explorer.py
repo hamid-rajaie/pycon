@@ -1,12 +1,27 @@
+import os
+
 import numpy as np
+import yaml
 from PyQt5 import QtCore
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QStandardItemModel
-from PyQt5.QtWidgets import QHeaderView, QMenu, QTableWidget, QTableWidgetItem, QTreeView, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import (
+    QFileDialog,
+    QHeaderView,
+    QMenu,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QTreeView,
+    QVBoxLayout,
+    QWidget,
+)
 
 from common.delegates.pycon_window_signal_explorer_delegate import PyConWindowSignalExplorerDelegate
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
+from common.plugins.pycon_plugin_params import PyConPluginParams
 from container.pycon_dialog_wait import PyConDialogWait
 from data_sources.pycon_data_source_base import PyConDataSourceBase
 from data_sources.pycon_standard_item import PyConStandardItem
@@ -19,10 +34,11 @@ class PyConPluginSignalExplorer(PyConPluginBase):
     # ==================================================
     signal_explorer_double_click = QtCore.pyqtSignal(int, int, str, np.ndarray, np.ndarray)
 
-    def __init__(self, pycon_data_source: PyConDataSourceBase):
+    def __init__(self, plugin_params: PyConPluginParams):
         super().__init__()
 
-        self.pycon_data_source = pycon_data_source
+        self.pycon_data_source = plugin_params.pycon_data_source
+        self.initial_yaml_dir = plugin_params.initial_yaml_dir
 
         self.setWindowTitle("Signal Explorer")
         #
@@ -30,10 +46,10 @@ class PyConPluginSignalExplorer(PyConPluginBase):
         #
         self.data_frame = None
 
-        self.table_widget = None
-        self.signal_tree_model = None
-        self.signal_tree_view = None
-        self.root_node = None
+        self.signal_tree_model_0 = None
+        self.signal_tree_view_0 = None
+        self.root_node_0 = None
+        self.root_node_1 = None
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.slot_timer_timeout)
@@ -44,62 +60,136 @@ class PyConPluginSignalExplorer(PyConPluginBase):
         self.search_text = ""
         self.search_cnt = 0
 
-        self.delegate = PyConWindowSignalExplorerDelegate(self)
-        self.delegate.newSearch.connect(self.slot_search)
+        self.delegate_0 = PyConWindowSignalExplorerDelegate(self)
+        self.delegate_0.newSearch.connect(self.slot_search)
+
+        self.delegate_1 = PyConWindowSignalExplorerDelegate(self)
+        self.delegate_1.newSearch.connect(self.slot_search)
+
+        self.tab_widget = None
 
         self.__initUI()
 
     def __initUI(self):
+
+        self.tab_widget = QTabWidget()
+
+        _widget_0 = self.tab_0()
+        _widget_1 = self.tab_1()
+
+        self.tab_widget.addTab(_widget_0, "Explorer")
+        self.tab_widget.addTab(_widget_1, "Alias")
+        self.setWidget(self.tab_widget)
+
+    def initPlugin(self):
+        self.add_signals_to_tree_view_0()
+
+    def tab_0(self):
         initial_row_count = 2
         initial_col_count = 2
         # ======================================================================
         # table widget
         # ======================================================================
-        self.table_widget = QTableWidget()
-        self.table_widget.setRowCount(initial_row_count)
-        self.table_widget.setColumnCount(initial_col_count)
+        table_widget_0 = QTableWidget()
+        table_widget_0.setRowCount(initial_row_count)
+        table_widget_0.setColumnCount(initial_col_count)
 
-        header = self.table_widget.horizontalHeader()
+        header_0 = table_widget_0.horizontalHeader()
 
-        self.table_widget.setHorizontalHeaderLabels(["Key", "Value"])
+        table_widget_0.setHorizontalHeaderLabels(["Key", "Value"])
 
-        self.table_widget.setItem(0, 0, QTableWidgetItem("File Name"))
-        self.table_widget.setItem(0, 1, QTableWidgetItem("a full path here"))
+        table_widget_0.setItem(0, 0, QTableWidgetItem("File Name"))
+        table_widget_0.setItem(0, 1, QTableWidgetItem("a full path here"))
 
-        self.table_widget.setItem(1, 0, QTableWidgetItem("Search"))
-        self.table_widget.setItemDelegateForRow(1, self.delegate)
+        table_widget_0.setItem(1, 0, QTableWidgetItem("Search"))
+        table_widget_0.setItemDelegateForRow(1, self.delegate_0)
 
-        header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+        header_0.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+        header_0.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
         #
         # create tree view/model
         #
-        self.signal_tree_view = QTreeView()
-        self.signal_tree_view.setHeaderHidden(True)
-        self.signal_tree_view.doubleClicked.connect(self.slot_signal_tree_view_double_clicked)
+        self.signal_tree_view_0 = QTreeView()
+        self.signal_tree_view_0.setHeaderHidden(True)
+        self.signal_tree_view_0.doubleClicked.connect(self.slot_signal_tree_view_double_clicked)
 
-        self.signal_tree_model = QStandardItemModel()
-        self.signal_tree_model.setHorizontalHeaderLabels([self.tr("Signal Name")])
-        self.root_node = self.signal_tree_model.invisibleRootItem()
+        self.signal_tree_model_0 = QStandardItemModel()
+        self.signal_tree_model_0.setHorizontalHeaderLabels([self.tr("Signal Name")])
+        self.root_node_0 = self.signal_tree_model_0.invisibleRootItem()
 
-        self.signal_tree_view.setModel(self.signal_tree_model)
+        self.signal_tree_view_0.setModel(self.signal_tree_model_0)
         #
         # create a layout, containing :
         #  1. the table widget
         #  2. the tree view
         #
-        _layout = QVBoxLayout()
-        _layout.addWidget(self.table_widget, 3)
-        _layout.addWidget(self.signal_tree_view, 7)
+        _layout_0 = QVBoxLayout()
+        _layout_0.addWidget(table_widget_0, 3)
+        _layout_0.addWidget(self.signal_tree_view_0, 7)
         #
         # widget of self
         #
-        _widget = QWidget()
-        _widget.setLayout(_layout)
-        self.setWidget(_widget)
+        _widget_0 = QWidget()
+        _widget_0.setLayout(_layout_0)
 
-    def initPlugin(self):
-        self.add_signals_to_tree_view()
+        return _widget_0
+
+    def tab_1(self):
+        initial_row_count = 3
+        initial_col_count = 2
+        # ======================================================================
+        # table widget
+        # ======================================================================
+        table_widget_1 = QTableWidget()
+        table_widget_1.setRowCount(initial_row_count)
+        table_widget_1.setColumnCount(initial_col_count)
+
+        header_1 = table_widget_1.horizontalHeader()
+
+        table_widget_1.setHorizontalHeaderLabels(["Key", "Value"])
+
+        table_widget_1.setItem(0, 0, QTableWidgetItem("File Name"))
+        table_widget_1.setItem(0, 1, QTableWidgetItem("a full path here"))
+
+        table_widget_1.setItem(1, 0, QTableWidgetItem("Search"))
+        table_widget_1.setItemDelegateForRow(1, self.delegate_1)
+
+        open_btn = QPushButton("Open")
+        open_btn.setCheckable(True)
+        open_btn.clicked.connect(self.open_yaml_file)
+
+        table_widget_1.setCellWidget(2, 0, open_btn)
+        table_widget_1.setItem(2, 1, QTableWidgetItem("Open yaml file"))
+
+        header_1.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+        header_1.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+        # ======================================================================
+        # create tree view/model
+        # ======================================================================
+        self.signal_tree_view_1 = QTreeView()
+        self.signal_tree_view_1.setHeaderHidden(False)
+        self.signal_tree_view_1.header().setStretchLastSection(False)
+        self.signal_tree_view_1.header().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+
+        signal_tree_model_1 = QStandardItemModel()
+        signal_tree_model_1.setHorizontalHeaderLabels([self.tr("Signal Name")])
+        self.root_node_1 = signal_tree_model_1.invisibleRootItem()
+
+        self.signal_tree_view_1.setModel(signal_tree_model_1)
+        # ======================================================================
+        # create a layout, containing :
+        #  1. the table widget
+        #  2. the tree view
+        # ======================================================================
+        _layout_1 = QVBoxLayout()
+        _layout_1.addWidget(table_widget_1, 3)
+        _layout_1.addWidget(self.signal_tree_view_1, 7)
+        # ======================================================================
+        # add widget
+        # ======================================================================
+        _widget_1 = QWidget()
+        _widget_1.setLayout(_layout_1)
+        return _widget_1
 
     # ==========================================================================
     # search
@@ -109,7 +199,7 @@ class PyConPluginSignalExplorer(PyConPluginBase):
         self.timer.stop()
         self.timer_started = False
 
-        self.add_signals_to_tree_view()
+        self.add_signals_to_tree_view_0()
 
     def slot_search(self, search_text):
         logger().info(f"{search_text} ... {self.search_cnt}")
@@ -183,9 +273,9 @@ class PyConPluginSignalExplorer(PyConPluginBase):
     # ==========================================================================
     # add signals
     # ==========================================================================
-    def add_signals_to_tree_view(self):
+    def add_signals_to_tree_view_0(self):
 
-        self.signal_tree_view.model().removeRows(0, self.signal_tree_view.model().rowCount())
+        self.signal_tree_view_0.model().removeRows(0, self.signal_tree_view_0.model().rowCount())
 
         for group_index, group in enumerate(self.pycon_data_source.data.groups):
             channel_group = group.channel_group
@@ -219,9 +309,107 @@ class PyConPluginSignalExplorer(PyConPluginBase):
             if std_item_channel_group is not None:
                 std_item_channel_group.appendRows(channels)
 
-                self.root_node.appendRow(std_item_channel_group)
+                self.root_node_0.appendRow(std_item_channel_group)
 
-        # self.signal_tree_view.setModel(self.signal_tree_model)
+        # self.signal_tree_view_0.setModel(self.signal_tree_model_0)
         if self.search_text != "":
             pass
-            self.signal_tree_view.expandAll()
+            self.signal_tree_view_0.expandAll()
+
+    def open_yaml_file(self):
+
+        dlg = QFileDialog(directory=self.initial_yaml_dir)
+
+        dlg.setNameFilters(get_pycon_config().pycon_start_yaml_filter)
+        dlg.selectNameFilter(get_pycon_config().pycon_start_yaml_filter_selected)
+
+        if dlg.exec_():
+            filenames = dlg.selectedFiles()
+            selected_file_name = filenames[0]
+            file_basename = os.path.basename(selected_file_name)
+            self.open_dir = os.path.dirname(selected_file_name)
+            file_basename_no_ext, file_basename_ext = os.path.splitext(file_basename)
+
+            with open(selected_file_name, "r") as file:
+                yaml_data_dict = yaml.safe_load(file)
+                dlg_wait = PyConDialogWait(self, "Parsing yaml")
+                self.pycon_data_source.setup_generic_real_map(yaml_data_dict=yaml_data_dict)
+                dlg_wait.hide_dialog()
+                self.add_alias_signals()
+
+    def add_alias_signals(self):
+
+        self.signal_tree_view_1.model().removeRows(0, self.signal_tree_view_1.model().rowCount())
+
+        std_item_found_signals = PyConStandardItem(
+            channel_group_index=-1,
+            channel_group_comment=None,
+            channel_index=-1,
+            text="found signals",
+            font_size=12,
+            set_bold=False,
+        )
+        self.root_node_1.setColumnCount(2)
+        self.root_node_1.appendRow(std_item_found_signals)
+
+        for alias, signal in self.pycon_data_source.generic_to_real_map.items():
+
+            if self.search_text in alias or self.search_text in signal:
+
+                std_item_alias = PyConStandardItem(
+                    channel_group_index=-1,
+                    channel_group_comment=None,
+                    channel_index=-1,
+                    text=f"{alias}",
+                    font_size=12,
+                    set_bold=False,
+                )
+
+                std_item_signal = PyConStandardItem(
+                    channel_group_index=-1,
+                    channel_group_comment=None,
+                    channel_index=-1,
+                    text=f"{signal}",
+                    font_size=12,
+                    set_bold=False,
+                )
+
+                std_item_found_signals.appendRow((std_item_alias, std_item_signal))
+
+        self.add_section(
+            text="missing needed generic signals", sig_list=self.pycon_data_source.needed_generic_signals()
+        )
+        self.add_section(
+            text="missing optional generic signals",
+            sig_list=self.pycon_data_source.optional_generic_signals(),
+        )
+
+        if self.search_text != "":
+            self.signal_tree_view_0.expandAll()
+
+    def add_section(self, text, sig_list):
+
+        std_item_alias = PyConStandardItem(
+            channel_group_index=-1,
+            channel_group_comment=None,
+            channel_index=-1,
+            text=text,
+            font_size=12,
+            set_bold=False,
+        )
+        self.root_node_1.appendRow(std_item_alias)
+
+        for signal in sig_list:
+
+            if self.search_text in signal:
+
+                std_item = PyConStandardItem(
+                    channel_group_index=-1,
+                    channel_group_comment=None,
+                    channel_index=-1,
+                    text=f"{signal}",
+                    font_size=12,
+                    set_bold=False,
+                )
+
+                std_item_alias.appendRow(std_item)
