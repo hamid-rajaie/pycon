@@ -352,7 +352,9 @@ class PyConPluginSignalExplorer(PyConPluginBase):
         self.root_node_1.setColumnCount(2)
         self.root_node_1.appendRow(std_item_found_signals)
 
-        for alias, signal in self.pycon_data_source.generic_to_real_map.items():
+        for alias, pycon_signal in self.pycon_data_source.generic_to_real_map.items():
+
+            signal = pycon_signal.real_signal_name
 
             if self.search_text in alias or self.search_text in signal:
 

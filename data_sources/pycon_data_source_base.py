@@ -4,6 +4,12 @@ from common.logging.logger import logger
 
 
 class PyConDataSourceBase:
+
+    class PyConSignal:
+        def __init__(self) -> None:
+            self.real_signal_name: str = None
+            self.time_series = None
+
     def __init__(self):
         self.data = None
 
@@ -24,8 +30,12 @@ class PyConDataSourceBase:
             "7": "roadEdgeRightRaised",
         }
 
-    def add_to_map(self, generic, real):
-        self.generic_to_real_map[generic] = real
+    def add_to_map(self, generic, real_signal_name):
+
+        signal: PyConDataSourceBase.PyConSignal = PyConDataSourceBase.PyConSignal()
+        signal.real_signal_name = real_signal_name
+
+        self.generic_to_real_map[generic] = signal
 
     def add_needed_generic(self, needed_generic_signal_name: str):
         self.missing_needed_generic_signals_names.append(needed_generic_signal_name)
@@ -69,22 +79,22 @@ class PyConDataSourceBase:
 
                 if isinstance(real_signals, list):
 
-                    for _, real_signal in enumerate(real_signals):
-                        if real_signal in data_source_signal_names:
-                            if self.regex_indicator not in real_signal:
-                                self.add_to_map(generic=generic_signal_name, real=real_signal)
+                    for _, real_signal_name in enumerate(real_signals):
+                        if real_signal_name in data_source_signal_names:
+                            if self.regex_indicator not in real_signal_name:
+                                self.add_to_map(generic=generic_signal_name, real_signal_name=real_signal_name)
                                 signal_available = True
                                 break
                         else:
-                            if self.regex_indicator in real_signal:
+                            if self.regex_indicator in real_signal_name:
                                 regex_indices_alias = [
                                     i for i, c in enumerate(generic_signal_name) if c == self.regex_indicator
                                 ]
                                 regex_indices_signal = [
-                                    i for i, c in enumerate(real_signal) if c == self.regex_indicator
+                                    i for i, c in enumerate(real_signal_name) if c == self.regex_indicator
                                 ]
                                 regex_pattern = re.escape(
-                                    real_signal[: regex_indices_signal[0]]
+                                    real_signal_name[: regex_indices_signal[0]]
                                 )  # add the initial part of the string
                                 for i, index in enumerate(regex_indices_signal):
                                     if i == 0:
@@ -92,13 +102,13 @@ class PyConDataSourceBase:
                                     prev_index = regex_indices_signal[i - 1]
                                     regex_pattern += r"(?P<index{}_>\d+)".format(i)  # add the named capturing group
                                     regex_pattern += re.escape(
-                                        real_signal[prev_index + 1 : index]
+                                        real_signal_name[prev_index + 1 : index]
                                     )  # add the text between the % and the next occurrence
                                 regex_pattern += r"(?P<index{}_>\d+)".format(
                                     len(regex_indices_signal)
                                 )  # add the final named capturing group
                                 regex_pattern += re.escape(
-                                    real_signal[regex_indices_signal[-1] + 1 :]
+                                    real_signal_name[regex_indices_signal[-1] + 1 :]
                                 )  # add the final part of the string
 
                                 # find all matches
@@ -108,7 +118,7 @@ class PyConDataSourceBase:
                                         if not isinstance(match, tuple):
                                             match = [match]
                                         new_generic_signal_name = generic_signal_name
-                                        new_signal = real_signal
+                                        new_signal = real_signal_name
                                         for pos, index in enumerate(match):
                                             new_generic_signal_name = (
                                                 new_generic_signal_name[: regex_indices_alias[pos]]
@@ -134,7 +144,7 @@ class PyConDataSourceBase:
                                                 )
                                                 + new_generic_signal_name[12:]
                                             )
-                                        self.add_to_map(generic=new_generic_signal_name, real=new_signal)
+                                        self.add_to_map(generic=new_generic_signal_name, real_signal_name=new_signal)
 
                                         signal_available = True
 
