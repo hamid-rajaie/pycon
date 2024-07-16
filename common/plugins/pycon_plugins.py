@@ -32,13 +32,13 @@ class PyConPlugins:
             for plugin in list_plugins:
                 plugin.initPlugin()
 
-    def read_generic_channels(self):
+    def add_generic_signals(self):
         for _, plugin in self.std_plugins.__dict__.items():
-            plugin.read_generic_channels()
+            plugin.add_generic_signals()
 
         for plugin_menu_group, list_plugins in self.detected_plugins.items():
             for plugin in list_plugins:
-                plugin.read_generic_channels()
+                plugin.add_generic_signals()
 
     def connect(self):
         # ==================================================
@@ -116,4 +116,5 @@ class PyConPlugins:
                                 and issubclass(item, PyConPluginBase)
                                 and item != PyConPluginBase
                             ):
-                                self.detected_plugins[plugin_menu_group].append(item(self.plugin_params))
+                                _plg = item(self.plugin_params)
+                                self.detected_plugins[plugin_menu_group].append(_plg)

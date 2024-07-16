@@ -19,7 +19,16 @@ class PyConTopViewPluginBase:
         )
 
     def initPlugin(self):
-        pass
+        raise Exception("initPlugin not implemented")
+
+    def add_generic_signals(self):
+        raise Exception("add_generic_signals not implemented")
+
+    def init(self, ax: axes, lines_2d: list):
+        raise Exception("init is not implemented")
+
+    def render(self, time_sec, lines_2d: list):
+        raise Exception("render is not implemented")
 
     def set_status_ok(self):
         self.status: PyConTopViewPluginBase.PyConLineInternalStatus = PyConTopViewPluginBase.PyConLineInternalStatus.OK
@@ -38,12 +47,6 @@ class PyConTopViewPluginBase:
         if self.status == PyConTopViewPluginBase.PyConLineInternalStatus.NOT_OK:
             return True
         return False
-
-    def init(self, ax: axes, lines_2d: list):
-        raise Exception("init is not implemented")
-
-    def render(self, time_sec, lines_2d: list):
-        raise Exception("render is not implemented")
 
     def plot_data(self, ax: axes, x_array, y_array, color, linewidth, markersize, label, marker=None):
         # https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes

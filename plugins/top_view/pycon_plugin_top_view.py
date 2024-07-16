@@ -56,6 +56,10 @@ class PyConWindowTopView(PyConPluginBase):
 
         super().initUI(widget=widget, with_menubar=True)
 
+    def add_generic_signals(self):
+        for plugin in self.plugins:
+            plugin.add_generic_signals()
+
     def get_settings(self):
         for plugin in self.plugins:
             self.settings[plugin.name] = {}

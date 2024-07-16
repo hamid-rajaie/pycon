@@ -143,7 +143,8 @@ class PyConMainWindow(QMainWindow):
             # ==================================================================
             # create plugins object
             # ==================================================================
-            tab.plugins = PyConPlugins(plugin_params=plugin_params)
+            tab_plugins = PyConPlugins(plugin_params=plugin_params)
+            tab.plugins = tab_plugins
             # ==================================================================
             # create main menu
             # ==================================================================
@@ -189,9 +190,10 @@ class PyConMainWindow(QMainWindow):
             # initialize  plugins
             # ==============================================================
             dlg_wait = PyConDialogWait(self, "Initializing Plugin Data")
-            tab.plugins.read_generic_channels()
-            tab.plugins.initPlugins()
-            tab.plugins.connect()
+            tab_plugins.add_generic_signals()
+            pycon_data_source.get_channels()
+            tab_plugins.initPlugins()
+            tab_plugins.connect()
             dlg_wait.hide_dialog()
 
     def __setup_plugin_geometry(self, tab_mdi_area, plugin):

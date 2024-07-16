@@ -60,6 +60,7 @@ class PyConDataSourceGroups:
 class PyConDataSourceCsvBase(PyConDataSourceBase):
 
     def __init__(self) -> None:
+        super().__init__()
         self.data = PyConDataSourceGroups()
 
     def set_data(self, data_frame: pd.DataFrame):

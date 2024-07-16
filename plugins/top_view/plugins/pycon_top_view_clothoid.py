@@ -106,17 +106,44 @@ class PyConTopViewClothoid(PyConTopViewPluginBase):
                 startPositionX = f"videoLines.{line_type}.startPositionX"
                 lookAheadDistance = f"videoLines.{line_type}.lookAheadDistance"
 
-                line_clothoid.latDeviation = self.pycon_data_source.get_channel(channel_name=latDeviation)
-                line_clothoid.curvature = self.pycon_data_source.get_channel(channel_name=curvature)
-                line_clothoid.curvatureChange = self.pycon_data_source.get_channel(channel_name=curvatureChange)
-                line_clothoid.headingAngle = self.pycon_data_source.get_channel(channel_name=headingAngle)
-                line_clothoid.startPositionX = self.pycon_data_source.get_channel(channel_name=startPositionX)
-                line_clothoid.lookAheadDistance = self.pycon_data_source.get_channel(channel_name=lookAheadDistance)
+                line_clothoid.latDeviation = self.pycon_data_source.get_time_series(generic_channel_name=latDeviation)
+                line_clothoid.curvature = self.pycon_data_source.get_time_series(generic_channel_name=curvature)
+                line_clothoid.curvatureChange = self.pycon_data_source.get_time_series(
+                    generic_channel_name=curvatureChange
+                )
+                line_clothoid.headingAngle = self.pycon_data_source.get_time_series(generic_channel_name=headingAngle)
+                line_clothoid.startPositionX = self.pycon_data_source.get_time_series(
+                    generic_channel_name=startPositionX
+                )
+                line_clothoid.lookAheadDistance = self.pycon_data_source.get_time_series(
+                    generic_channel_name=lookAheadDistance
+                )
 
             self.set_status_ok()
 
         except Exception as ex:
             logger().warning(str(ex))
+
+    def add_generic_signals(self):
+        self.pycon_data_source.add_generic_signal(plugin_name="Top View", generic_signal_name="timestamp")
+
+        for line in self.video_lines:
+            line_type = line.line_type
+            line_clothoid = line.line_clothoid
+
+            latDeviation = f"videoLines.{line_type}.clothoid.latDeviation"
+            curvature = f"videoLines.{line_type}.clothoid.curvature"
+            curvatureChange = f"videoLines.{line_type}.clothoid.curvatureChange"
+            headingAngle = f"videoLines.{line_type}.clothoid.headingAngle"
+            startPositionX = f"videoLines.{line_type}.startPositionX"
+            lookAheadDistance = f"videoLines.{line_type}.lookAheadDistance"
+
+            self.pycon_data_source.add_generic_signal(plugin_name="Top View", generic_signal_name=latDeviation)
+            self.pycon_data_source.add_generic_signal(plugin_name="Top View", generic_signal_name=curvature)
+            self.pycon_data_source.add_generic_signal(plugin_name="Top View", generic_signal_name=curvatureChange)
+            self.pycon_data_source.add_generic_signal(plugin_name="Top View", generic_signal_name=headingAngle)
+            self.pycon_data_source.add_generic_signal(plugin_name="Top View", generic_signal_name=startPositionX)
+            self.pycon_data_source.add_generic_signal(plugin_name="Top View", generic_signal_name=lookAheadDistance)
 
     def init(self, ax: axes, lines_2d: list):
         # https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes

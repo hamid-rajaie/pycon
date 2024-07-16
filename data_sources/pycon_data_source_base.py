@@ -9,6 +9,7 @@ class PyConDataSourceBase:
         def __init__(self) -> None:
             self.real_signal_name: str = None
             self.time_series = None
+            self.plugin_names = []
 
     def __init__(self):
         self.data = None
@@ -34,12 +35,35 @@ class PyConDataSourceBase:
         raise Exception("get_groups is not implemented")
 
     def get_channel(self, channel_name: str, group_index: int = None, channel_index: int = None):
-        return Exception("get_channel is not implemented")
+        raise Exception("get_channel is not implemented")
 
     def get_channels_names(self):
-        return Exception("get_channels is not implemented")
+        raise Exception("get_channels is not implemented")
 
-    def add_to_map(self, generic_signal_name, real_signal_name):
+    def add_generic_signal(self, plugin_name, generic_signal_name: str):
+        logger().info(f"[{plugin_name}] adds {generic_signal_name}")
+
+        if generic_signal_name not in self.generic_to_real_map.keys():
+            signal: PyConDataSourceBase.PyConSignal = PyConDataSourceBase.PyConSignal()
+            signal.real_signal_name = generic_signal_name
+            signal.plugin_names.append(plugin_name)
+            self.generic_to_real_map[generic_signal_name] = signal
+        else:
+            signal: PyConDataSourceBase.PyConSignal = self.generic_to_real_map[generic_signal_name]
+            signal.plugin_names.append(plugin_name)
+
+    def get_channels(self):
+        for generic_signal_name, signal in self.generic_to_real_map.items():
+            logger().info(
+                f"{generic_signal_name}, plugins : {signal.plugin_names} ... real_signal_name: {signal.real_signal_name}"
+            )
+            signal.time_series = self.get_channel(channel_name=signal.real_signal_name)
+
+    def get_time_series(self, generic_channel_name):
+        signal: PyConDataSourceBase.PyConSignal = self.generic_to_real_map[generic_channel_name]
+        return signal.time_series
+
+    def add_to_map(self, generic_signal_name: str, real_signal_name: str):
 
         signal: PyConDataSourceBase.PyConSignal = PyConDataSourceBase.PyConSignal()
         signal.real_signal_name = real_signal_name

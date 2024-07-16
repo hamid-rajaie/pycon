@@ -52,8 +52,6 @@ class PyConFoliumClick(MacroElement):
     def render(self, **kwargs):
         super().render(**kwargs)
 
-        logger().info("")
-
         figure = self.get_root()
         assert isinstance(figure, Figure), "You cannot render this Element if it is not in a Figure."
 
