@@ -379,11 +379,11 @@ class PyConPluginSignalExplorer(PyConPluginBase):
                 std_item_found_signals.appendRow((std_item_alias, std_item_signal))
 
         self.add_section(
-            text="missing needed generic signals", sig_list=self.pycon_data_source.needed_generic_signals()
+            text="missing needed generic signals", sig_list=self.pycon_data_source.missing_needed_generic_signals()
         )
         self.add_section(
             text="missing optional generic signals",
-            sig_list=self.pycon_data_source.optional_generic_signals(),
+            sig_list=self.pycon_data_source.missing_optional_generic_signals(),
         )
 
         if self.search_text != "":

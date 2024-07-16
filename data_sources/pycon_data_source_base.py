@@ -30,25 +30,6 @@ class PyConDataSourceBase:
             "7": "roadEdgeRightRaised",
         }
 
-    def add_to_map(self, generic, real_signal_name):
-
-        signal: PyConDataSourceBase.PyConSignal = PyConDataSourceBase.PyConSignal()
-        signal.real_signal_name = real_signal_name
-
-        self.generic_to_real_map[generic] = signal
-
-    def add_needed_generic(self, needed_generic_signal_name: str):
-        self.missing_needed_generic_signals_names.append(needed_generic_signal_name)
-
-    def add_optional_generic(self, optional_generic_signal_name: str):
-        self.missing_optional_generic_signals_names.append(optional_generic_signal_name)
-
-    def needed_generic_signals(self):
-        return self.missing_needed_generic_signals_names
-
-    def optional_generic_signals(self):
-        return self.missing_optional_generic_signals_names
-
     def get_groups(self):
         raise Exception("get_groups is not implemented")
 
@@ -57,6 +38,19 @@ class PyConDataSourceBase:
 
     def get_channels_names(self):
         return Exception("get_channels is not implemented")
+
+    def add_to_map(self, generic_signal_name, real_signal_name):
+
+        signal: PyConDataSourceBase.PyConSignal = PyConDataSourceBase.PyConSignal()
+        signal.real_signal_name = real_signal_name
+
+        self.generic_to_real_map[generic_signal_name] = signal
+
+    def missing_needed_generic_signals(self):
+        return self.missing_needed_generic_signals_names
+
+    def missing_optional_generic_signals(self):
+        return self.missing_optional_generic_signals_names
 
     def setup_generic_real_map(self, yaml_data_dict: dict) -> tuple:
 
@@ -82,7 +76,9 @@ class PyConDataSourceBase:
                     for _, real_signal_name in enumerate(real_signals):
                         if real_signal_name in data_source_signal_names:
                             if self.regex_indicator not in real_signal_name:
-                                self.add_to_map(generic=generic_signal_name, real_signal_name=real_signal_name)
+                                self.add_to_map(
+                                    generic_signal_name=generic_signal_name, real_signal_name=real_signal_name
+                                )
                                 signal_available = True
                                 break
                         else:
@@ -144,15 +140,17 @@ class PyConDataSourceBase:
                                                 )
                                                 + new_generic_signal_name[12:]
                                             )
-                                        self.add_to_map(generic=new_generic_signal_name, real_signal_name=new_signal)
+                                        self.add_to_map(
+                                            generic_signal_name=new_generic_signal_name, real_signal_name=new_signal
+                                        )
 
                                         signal_available = True
 
                                 if signal_available:
                                     break
                 if not signal_available and real_optional is not None:
-                    self.add_needed_generic(needed_generic_signal_name=generic_signal_name)
+                    self.missing_needed_generic_signals_names.append(generic_signal_name)
                 if not signal_available and real_optional is None:
-                    self.add_optional_generic(optional_generic_signal_name=generic_signal_name)
+                    self.missing_optional_generic_signals_names.append(generic_signal_name)
             except Exception as exp:
                 logger().warning(f"generic_signal_name: {generic_signal_name}  {str(exp)}")
