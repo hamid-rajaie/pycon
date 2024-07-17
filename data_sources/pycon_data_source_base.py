@@ -57,7 +57,10 @@ class PyConDataSourceBase:
             logger().info(
                 f"{generic_signal_name}, plugins : {signal.plugin_names} ... real_signal_name: {signal.real_signal_name}"
             )
-            signal.time_series = self.get_channel(channel_name=signal.real_signal_name)
+            try:
+                signal.time_series = self.get_channel(channel_name=signal.real_signal_name)
+            except Exception as ex:
+                logger().warning(f"{str(ex)}")
 
     def get_time_series(self, generic_channel_name):
         signal: PyConDataSourceBase.PyConSignal = self.generic_to_real_map[generic_channel_name]

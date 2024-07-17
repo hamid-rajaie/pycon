@@ -51,20 +51,27 @@ class PyConPluginSignalExplorer(PyConPluginBase):
         self.root_node_0 = None
         self.root_node_1 = None
 
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.slot_timer_timeout)
-        self.timer_started = False
+        self.timer_0 = QTimer(self)
+        self.timer_0.timeout.connect(self.slot_timer_timeout_0)
+        self.timer_started_0 = False
+
+        self.timer_1 = QTimer(self)
+        self.timer_1.timeout.connect(self.slot_timer_timeout_1)
+        self.timer_started_1 = False
 
         self.search_time_out = 1000
 
-        self.search_text = ""
-        self.search_cnt = 0
+        self.search_text_0 = ""
+        self.search_cnt_0 = 0
+
+        self.search_text_1 = ""
+        self.search_cnt_1 = 0
 
         self.delegate_0 = PyConWindowSignalExplorerDelegate(self)
-        self.delegate_0.newSearch.connect(self.slot_search)
+        self.delegate_0.newSearch.connect(self.slot_search_0)
 
         self.delegate_1 = PyConWindowSignalExplorerDelegate(self)
-        self.delegate_1.newSearch.connect(self.slot_search)
+        self.delegate_1.newSearch.connect(self.slot_search_1)
 
         self.tab_widget = None
 
@@ -194,26 +201,46 @@ class PyConPluginSignalExplorer(PyConPluginBase):
     # ==========================================================================
     # search
     # ==========================================================================
-    def slot_timer_timeout(self):
-        logger().info("timeout ... render result")
-        self.timer.stop()
-        self.timer_started = False
+    def slot_timer_timeout_0(self):
+        logger().info("timeout 0 ... render result")
+        self.timer_0.stop()
+        self.timer_started_0 = False
 
         self.add_signals_to_tree_view_0()
 
-    def slot_search(self, search_text):
-        logger().info(f"{search_text} ... {self.search_cnt}")
+    def slot_timer_timeout_1(self):
+        logger().info("timeout 1 ... render result")
+        self.timer_1.stop()
+        self.timer_started_1 = False
 
-        self.search_text = search_text
-        self.search_cnt = self.search_cnt + 1
+        self.add_signals_to_tree_view_1()
 
-        if not self.timer_started:
-            self.timer.start(self.search_time_out)
-            self.timer_started = True
+    def slot_search_0(self, search_text_0):
+
+        self.search_text_0 = search_text_0
+        self.search_cnt_0 = self.search_cnt_0 + 1
+
+        if not self.timer_started_0:
+            self.timer_0.start(self.search_time_out)
+            self.timer_started_0 = True
         else:
-            self.timer.stop()
-            self.timer.start(self.search_time_out)
-            self.timer_started = True
+            self.timer_0.stop()
+            self.timer_0.start(self.search_time_out)
+            self.timer_started_0 = True
+        return
+
+    def slot_search_1(self, search_text_1):
+
+        self.search_text_1 = search_text_1
+        self.search_cnt_1 = self.search_cnt_1 + 1
+
+        if not self.timer_started_1:
+            self.timer_1.start(self.search_time_out)
+            self.timer_started_1 = True
+        else:
+            self.timer_1.stop()
+            self.timer_1.start(self.search_time_out)
+            self.timer_started_1 = True
         return
 
     # ==========================================================================
@@ -285,7 +312,7 @@ class PyConPluginSignalExplorer(PyConPluginBase):
 
             channels = []
             for channel_index, channel in enumerate(group.channels):
-                if self.search_text in channel.name:
+                if self.search_text_0 in channel.name:
                     if std_item_channel_group is None:
                         std_item_channel_group = PyConStandardItem(
                             channel_group_index=-1,
@@ -312,7 +339,7 @@ class PyConPluginSignalExplorer(PyConPluginBase):
                 self.root_node_0.appendRow(std_item_channel_group)
 
         # self.signal_tree_view_0.setModel(self.signal_tree_model_0)
-        if self.search_text != "":
+        if self.search_text_0 != "":
             pass
             self.signal_tree_view_0.expandAll()
 
@@ -335,9 +362,9 @@ class PyConPluginSignalExplorer(PyConPluginBase):
                 dlg_wait = PyConDialogWait(self, "Parsing yaml")
                 self.pycon_data_source.setup_generic_real_map(yaml_data_dict=yaml_data_dict)
                 dlg_wait.hide_dialog()
-                self.add_alias_signals()
+                self.add_signals_to_tree_view_1()
 
-    def add_alias_signals(self):
+    def add_signals_to_tree_view_1(self):
 
         self.signal_tree_view_1.model().removeRows(0, self.signal_tree_view_1.model().rowCount())
 
@@ -356,7 +383,7 @@ class PyConPluginSignalExplorer(PyConPluginBase):
 
             signal = pycon_signal.real_signal_name
 
-            if self.search_text in alias or self.search_text in signal:
+            if self.search_text_1 in alias or self.search_text_1 in signal:
 
                 std_item_alias = PyConStandardItem(
                     channel_group_index=-1,
@@ -386,7 +413,7 @@ class PyConPluginSignalExplorer(PyConPluginBase):
             sig_list=self.pycon_data_source.missing_optional_generic_signals(),
         )
 
-        if self.search_text != "":
+        if self.search_text_1 != "":
             self.signal_tree_view_0.expandAll()
 
     def add_section(self, text, sig_list):
@@ -403,7 +430,7 @@ class PyConPluginSignalExplorer(PyConPluginBase):
 
         for signal in sig_list:
 
-            if self.search_text in signal:
+            if self.search_text_1 in signal:
 
                 std_item = PyConStandardItem(
                     channel_group_index=-1,
