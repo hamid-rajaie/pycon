@@ -106,16 +106,20 @@ class PyConTopViewClothoid(PyConTopViewPluginBase):
                 startPositionX = f"videoLines.{line_type}.startPositionX"
                 lookAheadDistance = f"videoLines.{line_type}.lookAheadDistance"
 
-                line_clothoid.latDeviation = self.pycon_data_source.get_time_series(generic_channel_name=latDeviation)
-                line_clothoid.curvature = self.pycon_data_source.get_time_series(generic_channel_name=curvature)
-                line_clothoid.curvatureChange = self.pycon_data_source.get_time_series(
+                line_clothoid.latDeviation = self.pycon_data_source.get_real_signal_series(
+                    generic_channel_name=latDeviation
+                )
+                line_clothoid.curvature = self.pycon_data_source.get_real_signal_series(generic_channel_name=curvature)
+                line_clothoid.curvatureChange = self.pycon_data_source.get_real_signal_series(
                     generic_channel_name=curvatureChange
                 )
-                line_clothoid.headingAngle = self.pycon_data_source.get_time_series(generic_channel_name=headingAngle)
-                line_clothoid.startPositionX = self.pycon_data_source.get_time_series(
+                line_clothoid.headingAngle = self.pycon_data_source.get_real_signal_series(
+                    generic_channel_name=headingAngle
+                )
+                line_clothoid.startPositionX = self.pycon_data_source.get_real_signal_series(
                     generic_channel_name=startPositionX
                 )
-                line_clothoid.lookAheadDistance = self.pycon_data_source.get_time_series(
+                line_clothoid.lookAheadDistance = self.pycon_data_source.get_real_signal_series(
                     generic_channel_name=lookAheadDistance
                 )
 

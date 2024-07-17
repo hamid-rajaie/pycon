@@ -118,7 +118,7 @@ class PyConPluginSignalExplorer(PyConPluginBase):
         #
         self.signal_tree_view_0 = QTreeView()
         self.signal_tree_view_0.setHeaderHidden(True)
-        self.signal_tree_view_0.doubleClicked.connect(self.slot_signal_tree_view_double_clicked)
+        self.signal_tree_view_0.doubleClicked.connect(self.slot_signal_tree_view_0_double_clicked)
 
         self.signal_tree_model_0 = QStandardItemModel()
         self.signal_tree_model_0.setHorizontalHeaderLabels([self.tr("Signal Name")])
@@ -246,7 +246,7 @@ class PyConPluginSignalExplorer(PyConPluginBase):
     # ==========================================================================
     # double click
     # ==========================================================================
-    def slot_signal_tree_view_double_clicked(self, modelIndex):
+    def slot_signal_tree_view_0_double_clicked(self, modelIndex):
         """
         :param modelIndex: a PyQt5.QtCore.QModelIndex
         """
@@ -361,6 +361,7 @@ class PyConPluginSignalExplorer(PyConPluginBase):
                 yaml_data_dict = yaml.safe_load(file)
                 dlg_wait = PyConDialogWait(self, "Parsing yaml")
                 self.pycon_data_source.setup_generic_real_map(yaml_data_dict=yaml_data_dict)
+                self.pycon_data_source.get_channels()
                 dlg_wait.hide_dialog()
                 self.add_signals_to_tree_view_1()
 
@@ -405,10 +406,10 @@ class PyConPluginSignalExplorer(PyConPluginBase):
 
                 std_item_found_signals.appendRow((std_item_alias, std_item_signal))
 
-        self.add_section(
+        self.add_section_1(
             text="missing needed generic signals", sig_list=self.pycon_data_source.missing_needed_generic_signals()
         )
-        self.add_section(
+        self.add_section_1(
             text="missing optional generic signals",
             sig_list=self.pycon_data_source.missing_optional_generic_signals(),
         )
@@ -416,7 +417,7 @@ class PyConPluginSignalExplorer(PyConPluginBase):
         if self.search_text_1 != "":
             self.signal_tree_view_0.expandAll()
 
-    def add_section(self, text, sig_list):
+    def add_section_1(self, text, sig_list):
 
         std_item_alias = PyConStandardItem(
             channel_group_index=-1,

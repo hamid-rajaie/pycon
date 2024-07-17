@@ -31,6 +31,8 @@ class PyConWindowTopView(PyConPluginBase):
         self.lines_2d = []
         self.widget_1_layout = None
 
+        self.set_status_not_ok()
+
         self.__initUI()
 
         # ======================================================================
@@ -57,8 +59,14 @@ class PyConWindowTopView(PyConPluginBase):
         super().initUI(widget=widget, with_menubar=True)
 
     def add_generic_signals(self):
-        for plugin in self.plugins:
-            plugin.add_generic_signals()
+        if self.is_status_ok():
+            for plugin in self.plugins:
+                plugin.add_generic_signals()
+
+    def initPlugin(self):
+        if self.is_status_ok():
+            for plugin in self.plugins:
+                plugin.initPlugin()
 
     def get_settings(self):
         for plugin in self.plugins:
@@ -87,10 +95,6 @@ class PyConWindowTopView(PyConPluginBase):
                                 plugins.append(item(params))
 
         return plugins
-
-    def initPlugin(self):
-        for plugin in self.plugins:
-            plugin.initPlugin()
 
     def __create_top_view(self):
         # https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html

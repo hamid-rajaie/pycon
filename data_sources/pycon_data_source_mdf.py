@@ -26,6 +26,8 @@ class PyConDataSourceMdf(PyConDataSourceBase):
         self.iter_mdf = self.data.channels_db.keys()
         logger().info((f"len(self.iter_mdf) : {len(self.iter_mdf)}"))
 
+        # self.print()
+
     def get_groups(self):
         return self.data.groups
 
@@ -37,5 +39,30 @@ class PyConDataSourceMdf(PyConDataSourceBase):
         channel_names = [channel.name for group in self.data.groups for channel in group.channels]
         return channel_names
 
-    def get_channels_names_v2(self):
-        return self.data.channels_db.keys()
+    def print(self):
+
+        logger().info("================================================")
+        logger().info("channels_db")
+        logger().info("================================================")
+        # https://asammdf.readthedocs.io/en/2.1.0/mdf4.html
+        # The channel_db attribute is a dictionary that holds the (data group index, channel index)
+        # pair for all signals. This is used to speed up the get_signal_by_name method.
+        for key, val in self.data.channels_db.items():
+            logger().info(f"{key}")
+            for elem in val:
+                logger().info(f"... {elem}")
+        """
+        logger().info("================================================")
+        logger().info("groups")
+        logger().info("================================================")
+        # https://asammdf.readthedocs.io/en/2.1.0/mdf4.html
+        # The groups attribute is a dictionary list with the following keys:
+        for group in self.data.groups:
+            logger().info(f"{dir(group)}")
+            for channel in group.channels:
+                # logger().info(f"{channel.name}")
+                logger().info(f"... {channel.name}  {channel.id}")
+
+        logger().info("================================================")
+        logger().info("================================================")
+        """

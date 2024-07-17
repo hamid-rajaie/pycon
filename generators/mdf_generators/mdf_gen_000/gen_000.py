@@ -76,6 +76,18 @@ class SignalGenerator:
             unit="u1",
         )
         # ======================================================================
+        self.lat = Signal(
+            samples=np.full(time.shape, 48.8519425),
+            timestamps=time,
+            name="gps lat 0",
+            unit="u1",
+        )
+        self.lon = Signal(
+            samples=np.full(time.shape, 9.1212484),
+            timestamps=time,
+            name="gps lon 0",
+            unit="u1",
+        )
 
     def func_1(self):
         with MDF(version="4.10") as mdf4:
@@ -88,10 +100,12 @@ class SignalGenerator:
                 self.videoLines_right_dy,
                 self.videoLines_right_curv,
             ]
+            channel_3 = [self.lat, self.lon]
 
             mdf4.append(channel_0, comment="runnable_0")
             mdf4.append(channel_1, comment="runnable_1")
             mdf4.append(channel_2, comment="runnable_2")
+            mdf4.append(channel_3, comment="gps")
 
             mdf4.save("output/file_000.mf4", overwrite=True)
 

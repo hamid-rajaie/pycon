@@ -18,3 +18,10 @@ class PyConSignalNotFound(PyConException):
         msg = "SignalNotFound"
         super().__init__(msg)
         self.signal_name = signal_name
+
+
+class PyConSignalTimeSeriesNotFound(PyConException):
+    def __init__(self, signal_name: str):
+        msg = f"PyConSignalTimeSeriesNotFound, time series not found for {signal_name}"
+        super().__init__(msg)
+        self.signal_name = signal_name

@@ -43,6 +43,32 @@ vel_y:
   - 1
   optional: vcc
 
+lat_wgs84:
+  signal:
+  - "gps lat 0"
+  - "gps lat 1"
+  - "gps lat 2"
+  - "gps lat 3"
+  norm:
+  - 1
+  - 1
+  - 1
+  - 1
+  optional: gps
+
+lon_wgs84:
+  signal:
+  - "gps lon 0"
+  - "gps lon 1"
+  - "gps lon 2"
+  - "gps lon 3"
+  norm:
+  - 1
+  - 1
+  - 1
+  - 1
+  optional: gps
+
 
 dummy_0:
   signal:

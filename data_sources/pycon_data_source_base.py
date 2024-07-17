@@ -1,14 +1,22 @@
 import re
 
+from common.exceptions.exceptions import PyConSignalTimeSeriesNotFound
 from common.logging.logger import logger
+from pycon_config import get_pycon_config
 
 
 class PyConDataSourceBase:
 
     class PyConSignal:
         def __init__(self) -> None:
+            self.real_time_name = None
+            self.real_time_series = None
+
             self.real_signal_name: str = None
-            self.time_series = None
+            self.real_signal_series = None
+
+            self.group_index: int = None
+            self.real_signal_channel_index: int = None
             self.plugin_names = []
 
     def __init__(self):
@@ -54,19 +62,52 @@ class PyConDataSourceBase:
 
     def get_channels(self):
         for generic_signal_name, signal in self.generic_to_real_map.items():
-            logger().info(
-                f"{generic_signal_name}, plugins : {signal.plugin_names} ... real_signal_name: {signal.real_signal_name}"
-            )
+
             try:
-                signal.time_series = self.get_channel(channel_name=signal.real_signal_name)
+                signal.real_signal_series = self.get_channel(channel_name=signal.real_signal_name)
+
+                # ((data group index, channel index)(data group index, channel index)..)
+                _set_real = self.data.channels_db[signal.real_signal_name]
+
+                if len(_set_real) != 1:
+                    for elem in _set_real:
+                        group_index = elem[0]
+                        real_signal_channel_index = elem[1]
+                        logger().warning(f"group_index:{group_index}, channel_index:{real_signal_channel_index}")
+                    raise Exception("more than one channels found")
+
+                signal.group_index = _set_real[0][0]
+                signal.real_signal_channel_index = _set_real[0][1]
+                logger().info(
+                    f"group_index:{signal.group_index}, real_signal_channel_index:{signal.real_signal_channel_index}"
+                )
+
+                for sig_time in get_pycon_config().pycon_time_signals:
+                    try:
+                        signal.real_time_series = self.get_channel(
+                            channel_name=sig_time, group_index=signal.group_index
+                        )
+                        signal.real_time_name = sig_time
+
+                    except Exception:
+                        # logger().warning(f"{sig_time} not found")
+                        pass
+
+                if signal.real_time_name is None or signal.real_time_series is None:
+                    raise Exception("time not found")
+
             except Exception as ex:
-                logger().warning(f"{str(ex)}")
+                logger().warning(f"{type(ex)} {str(ex)}, plugins:{signal.plugin_names}")
 
-    def get_time_series(self, generic_channel_name):
+    def get_real_signal_series(self, generic_channel_name):
         signal: PyConDataSourceBase.PyConSignal = self.generic_to_real_map[generic_channel_name]
-        return signal.time_series
+        if signal.real_time_series is None or signal.real_signal_series is None:
+            # logger().warning(f"time series not found for {generic_channel_name}")
+            raise PyConSignalTimeSeriesNotFound(signal_name=generic_channel_name)
 
-    def add_to_map(self, generic_signal_name: str, real_signal_name: str):
+        return (signal.real_time_series, signal.real_signal_series)
+
+    def __add_to_map(self, generic_signal_name: str, real_signal_name: str):
 
         signal: PyConDataSourceBase.PyConSignal = PyConDataSourceBase.PyConSignal()
         signal.real_signal_name = real_signal_name
@@ -81,7 +122,7 @@ class PyConDataSourceBase:
 
     def setup_generic_real_map(self, yaml_data_dict: dict) -> tuple:
 
-        self.generic_to_real_map: dict = {}
+        # self.generic_to_real_map: dict = {}
         self.missing_needed_generic_signals_names: list = []
         self.missing_optional_generic_signals_names: list = []
 
@@ -103,7 +144,7 @@ class PyConDataSourceBase:
                     for _, real_signal_name in enumerate(real_signals):
                         if real_signal_name in data_source_signal_names:
                             if self.regex_indicator not in real_signal_name:
-                                self.add_to_map(
+                                self.__add_to_map(
                                     generic_signal_name=generic_signal_name, real_signal_name=real_signal_name
                                 )
                                 signal_available = True
@@ -167,7 +208,7 @@ class PyConDataSourceBase:
                                                 )
                                                 + new_generic_signal_name[12:]
                                             )
-                                        self.add_to_map(
+                                        self.__add_to_map(
                                             generic_signal_name=new_generic_signal_name, real_signal_name=new_signal
                                         )
 

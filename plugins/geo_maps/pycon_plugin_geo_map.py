@@ -1,4 +1,5 @@
 import io
+import traceback
 
 import folium
 from jinja2 import Template
@@ -8,6 +9,7 @@ from PyQt5.QtWebChannel import QWebChannel
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QAction, QMenu
 
+from common.exceptions.exceptions import PyConSignalTimeSeriesNotFound
 from common.logging.logger import logger
 from common.plugins.pycon_plugin_base import PyConPluginBase
 from common.plugins.pycon_plugin_params import PyConPluginParams
@@ -29,11 +31,6 @@ class PyConPluginGeoMap(PyConPluginBase):
     lat_wgs84: INS_Lat_Abs
     """
 
-    # ==================================================
-    # SIGNALS
-    # ==================================================
-    signal_time_loaded = QtCore.pyqtSignal(float, float)
-
     def __init__(self, params: PyConPluginParams):
         super().__init__()
 
@@ -52,7 +49,7 @@ class PyConPluginGeoMap(PyConPluginBase):
         self.__initUI()
 
     def add_generic_signals(self):
-        self.pycon_data_source.add_generic_signal(plugin_name=self.windowTitle(), generic_signal_name="timestamp")
+        # self.pycon_data_source.add_generic_signal(plugin_name=self.windowTitle(), generic_signal_name="timestamp")
         self.pycon_data_source.add_generic_signal(plugin_name=self.windowTitle(), generic_signal_name="lon_wgs84")
         self.pycon_data_source.add_generic_signal(plugin_name=self.windowTitle(), generic_signal_name="lat_wgs84")
 
@@ -73,10 +70,8 @@ class PyConPluginGeoMap(PyConPluginBase):
         try:
             self.__render_geo_map()
 
-            self.signal_time_loaded.emit(
-                self.pycon_data_source.get_time_series(generic_channel_name="timestamp").samples[0],
-                self.pycon_data_source.get_time_series(generic_channel_name="timestamp").samples[-1],
-            )
+        except PyConSignalTimeSeriesNotFound as ex:
+            logger().warning(str(ex))
         except Exception as ex:
             logger().warning(str(ex))
 
@@ -102,14 +97,24 @@ class PyConPluginGeoMap(PyConPluginBase):
 
         time_sec = time.get_time_sec()
 
-        idx, t = find_nearest_time(
-            arr=self.pycon_data_source.get_time_series(generic_channel_name="timestamp").samples, value=time_sec
-        )
+        try:
 
-        lon_wgs84 = self.pycon_data_source.get_time_series(generic_channel_name="lon_wgs84").samples[idx]
-        lat_wgs84 = self.pycon_data_source.get_time_series(generic_channel_name="lat_wgs84").samples[idx]
+            (time_lon_series, lon_wgs84_series) = self.pycon_data_source.get_real_signal_series(
+                generic_channel_name="lon_wgs84"
+            )
+            (time_lat_series, lat_wgs84_series) = self.pycon_data_source.get_real_signal_series(
+                generic_channel_name="lat_wgs84"
+            )
 
-        self.__add_marker(latitude=lat_wgs84, longitude=lon_wgs84)
+            idx, t = find_nearest_time(arr=time_lon_series.samples, value=time_sec)
+
+            lon_wgs84 = lon_wgs84_series.samples[idx]
+            lat_wgs84 = lat_wgs84_series.samples[idx]
+
+            self.__add_marker(latitude=lat_wgs84, longitude=lon_wgs84)
+        except Exception as ex:
+            logger().warning("putting marker on the map not possible")
+            # logger().error(f"{traceback.print_exception(type(ex), ex, ex.__traceback__)}")
 
     def __add_marker(self, latitude, longitude):
         # L.marker([{{latitude}}, {{longitude}}] ).addTo({{map}});
