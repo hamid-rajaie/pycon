@@ -16,7 +16,6 @@ class PyConDataSourceBase:
             self.real_signal_series = None
 
             self.group_index: int = None
-            self.real_signal_channel_index: int = None
             self.plugin_names = []
 
     def __init__(self):
@@ -66,21 +65,21 @@ class PyConDataSourceBase:
             try:
                 signal.real_signal_series = self.get_channel(channel_name=signal.real_signal_name)
 
-                # ((data group index, channel index)(data group index, channel index)..)
-                _set_real = self.data.channels_db[signal.real_signal_name]
+                try:
+                    # ((data group index, channel index)(data group index, channel index)..)
+                    _set_real = self.data.channels_db[signal.real_signal_name]
 
-                if len(_set_real) != 1:
-                    for elem in _set_real:
-                        group_index = elem[0]
-                        real_signal_channel_index = elem[1]
-                        logger().warning(f"group_index:{group_index}, channel_index:{real_signal_channel_index}")
-                    raise Exception("more than one channels found")
+                    if len(_set_real) != 1:
+                        for elem in _set_real:
+                            group_index = elem[0]
+                            _channel_index = elem[1]
+                            logger().warning(f"group_index:{group_index}, channel_index:{_channel_index}")
+                        raise Exception("more than one channels found")
 
-                signal.group_index = _set_real[0][0]
-                signal.real_signal_channel_index = _set_real[0][1]
-                logger().info(
-                    f"group_index:{signal.group_index}, real_signal_channel_index:{signal.real_signal_channel_index}"
-                )
+                    signal.group_index = _set_real[0][0]
+                    logger().info(f"group_index:{signal.group_index}, _channel_index:{signal._channel_index}")
+                except AttributeError as ex:
+                    signal.group_index = 0
 
                 for sig_time in get_pycon_config().pycon_time_signals:
                     try:

@@ -26,7 +26,7 @@ class PyConDataSourceMdf(PyConDataSourceBase):
         self.iter_mdf = self.data.channels_db.keys()
         logger().info((f"len(self.iter_mdf) : {len(self.iter_mdf)}"))
 
-        # self.print()
+        self.print()
 
     def get_groups(self):
         return self.data.groups

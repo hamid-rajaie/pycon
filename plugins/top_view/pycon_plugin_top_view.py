@@ -31,7 +31,7 @@ class PyConWindowTopView(PyConPluginBase):
         self.lines_2d = []
         self.widget_1_layout = None
 
-        self.set_status_not_ok()
+        self.set_status_ok()
 
         self.__initUI()
 
